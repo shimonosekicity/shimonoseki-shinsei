@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>農業振興地域整備計画変更申出書 作成フォーム</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Hiragino Sans", "Meiryo", sans-serif; background: #f0f4f8; color: #2d3748; min-height: 100vh; }
+    header { background: #276749; color: white; padding: 20px 24px; }
+    header h1 { font-size: 1.1rem; font-weight: 700; letter-spacing: 0.03em; }
+    header p { margin-top: 4px; font-size: 0.85rem; opacity: 0.85; }
+    .container { max-width: 680px; margin: 32px auto; padding: 0 16px 48px; }
+    .card { background: white; border-radius: 12px; padding: 28px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    .card h2 { font-size: 0.95rem; font-weight: 700; color: #276749; border-left: 4px solid #276749; padding-left: 10px; margin-bottom: 20px; }
+    .field { margin-bottom: 18px; }
+    .field:last-child { margin-bottom: 0; }
+    label { display: block; font-size: 0.875rem; font-weight: 600; color: #4a5568; margin-bottom: 6px; }
+    label .required { color: #e53e3e; margin-left: 4px; font-size: 0.75rem; }
+    label .hint { color: #a0aec0; font-weight: 400; font-size: 0.78rem; margin-left: 6px; }
+    input[type="text"], input[type="number"], select, textarea {
+      width: 100%; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 8px;
+      font-size: 0.95rem; font-family: inherit; color: #2d3748; background: #fff;
+      transition: border-color 0.2s; -webkit-appearance: none;
+    }
+    input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:focus {
+      outline: none; border-color: #276749; box-shadow: 0 0 0 3px rgba(39,103,73,0.1);
+    }
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23718096' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px;
+    }
+    textarea { resize: vertical; min-height: 100px; }
+    .row { display: flex; gap: 12px; }
+    .row .field { flex: 1; }
+    .zip-row { display: flex; gap: 8px; align-items: flex-end; margin-bottom: 10px; }
+    .zip-row input { flex: 1; max-width: 160px; }
+    .zip-btn { padding: 10px 16px; background: #e2e8f0; border: 1.5px solid #cbd5e0; border-radius: 8px; font-size: 0.875rem; font-family: inherit; color: #4a5568; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
+    .zip-btn:hover { background: #cbd5e0; }
+    .zip-msg { font-size: 0.78rem; margin-top: 4px; min-height: 18px; }
+    .zip-msg.ok { color: #38a169; } .zip-msg.err { color: #e53e3e; } .zip-msg.loading { color: #718096; }
+    .date-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .date-row .era-sel { width: 90px; flex-shrink: 0; }
+    .date-row .year-num { width: 68px; flex-shrink: 0; }
+    .date-row .month-sel { width: 68px; flex-shrink: 0; }
+    .date-row .day-sel { width: 68px; flex-shrink: 0; }
+    .date-lbl { color: #4a5568; font-size: 0.9rem; flex-shrink: 0; }
+    .optional-section { border: 1.5px dashed #e2e8f0; border-radius: 8px; padding: 16px; margin-top: 12px; }
+    .optional-toggle { font-size: 0.875rem; font-weight: 600; color: #276749; cursor: pointer; display: flex; align-items: center; gap: 6px; background: none; border: none; font-family: inherit; padding: 0; }
+    .note-box { background: #f0fff4; border: 1.5px solid #9ae6b4; border-radius: 8px; padding: 12px 16px; font-size: 0.82rem; color: #22543d; margin-bottom: 16px; }
+    .back-btn { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 16px; padding: 10px 18px; background: white; color: #276749; border: 1.5px solid #276749; border-radius: 8px; font-size: 0.875rem; font-weight: 600; text-decoration: none; transition: background 0.15s, color 0.15s; }
+    .back-btn:hover { background: #276749; color: white; }
+    .submit-btn { width: 100%; padding: 14px; background: #276749; color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700; font-family: inherit; letter-spacing: 0.05em; cursor: pointer; transition: background 0.2s; margin-top: 8px; }
+    .submit-btn:hover { background: #1f5237; }
+    .note { font-size: 0.8rem; color: #718096; text-align: center; margin-top: 14px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>農業振興地域整備計画変更申出書　作成フォーム</h1>
+  <p>下関市農業委員会</p>
+</header>
+
+<div class="container">
+  <a href="/" class="back-btn">← 申請書の選択に戻る</a>
+
+  <div class="note-box">
+    📋 <strong>ご注意：</strong>セクション４〜７（農用地の状況・影響・事業計画等）はダウンロード後にWordファイルへ直接ご記入ください。
+  </div>
+
+  <form id="mainForm" action="/generate_noshin_moushide" method="POST" novalidate>
+    <input type="hidden" name="moushide_date" id="h_moushide_date">
+
+    <!-- 申出日 -->
+    <div class="card">
+      <h2>申出日</h2>
+      <div class="field">
+        <label>申出日<span class="required">必須</span></label>
+        <div class="date-row">
+          <select id="moushide_era" class="era-sel"><option value="平成">平成</option><option value="令和" selected>令和</option></select>
+          <input type="number" id="moushide_year" class="year-num" min="1" max="99" placeholder="年">
+          <span class="date-lbl">年</span>
+          <select id="moushide_month" class="month-sel"><option value="">--</option></select>
+          <span class="date-lbl">月</span>
+          <select id="moushide_day" class="day-sel"><option value="">--</option></select>
+          <span class="date-lbl">日</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 申出者情報 -->
+    <div class="card">
+      <h2>申出者情報</h2>
+      <div class="field">
+        <label>郵便番号</label>
+        <div class="zip-row">
+          <input type="text" id="zip1" placeholder="例：7500031" maxlength="8" name="shinshutsu_zip">
+          <button type="button" class="zip-btn" onclick="searchZip('zip1','jusho1_input')">住所を検索</button>
+        </div>
+        <div id="zip1_msg" class="zip-msg"></div>
+      </div>
+      <div class="field">
+        <label>住所<span class="required">必須</span></label>
+        <input type="text" name="shinshutsu_jusho" id="jusho1_input" placeholder="下関市竹崎町1丁目1番1号" required>
+      </div>
+      <div class="field">
+        <label>TEL</label>
+        <input type="text" name="shinshutsu_tel" placeholder="083-231-1111">
+      </div>
+      <div class="field">
+        <label>氏名<span class="required">必須</span></label>
+        <input type="text" name="shinshutsu_shimei" placeholder="山田 太郎" required>
+      </div>
+
+      <!-- 申出代行者（任意） -->
+      <div style="margin-top:12px">
+        <button type="button" class="optional-toggle" onclick="toggleDaiko()">
+          <span id="daiko_icon">＋</span> 申出代行者がいる場合はここをタップ
+        </button>
+        <div id="daiko_section" class="optional-section" style="display:none; margin-top:12px;">
+          <div class="field">
+            <label>郵便番号（代行者）</label>
+            <div class="zip-row">
+              <input type="text" id="zip2" placeholder="例：7500031" maxlength="8" name="daiko_zip">
+              <button type="button" class="zip-btn" onclick="searchZip('zip2','jusho2_input')">住所を検索</button>
+            </div>
+            <div id="zip2_msg" class="zip-msg"></div>
+          </div>
+          <div class="field">
+            <label>住所（代行者）</label>
+            <input type="text" name="daiko_jusho" id="jusho2_input" placeholder="下関市竹崎町1丁目1番1号">
+          </div>
+          <div class="field">
+            <label>TEL（代行者）</label>
+            <input type="text" name="daiko_tel" placeholder="083-231-1111">
+          </div>
+          <div class="field">
+            <label>氏名（代行者）</label>
+            <input type="text" name="daiko_shimei" placeholder="山田 花子">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 申出地情報 -->
+    <div class="card">
+      <h2>申出地情報</h2>
+      <div class="row">
+        <div class="field">
+          <label>大字<span class="required">必須</span></label>
+          <input type="text" name="oaza" placeholder="彦島" required>
+        </div>
+        <div class="field">
+          <label>字</label>
+          <input type="text" name="aza" placeholder="江の浦">
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>地番<span class="required">必須</span></label>
+          <input type="text" name="chiban" placeholder="123-4" required>
+        </div>
+        <div class="field">
+          <label>地目（現況）<span class="required">必須</span></label>
+          <select name="chimoku" required>
+            <option value="">選択してください</option>
+            <option value="田">田</option>
+            <option value="畑">畑</option>
+            <option value="樹園地">樹園地</option>
+            <option value="採草放牧地">採草放牧地</option>
+            <option value="混牧林地">混牧林地</option>
+            <option value="農業用施設用地">農業用施設用地</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>面積（㎡）<span class="required">必須</span></label>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input type="text" name="menseki" placeholder="500" style="width:120px" required>
+          <span style="font-size:0.9rem;color:#4a5568;">㎡</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>所有権者 住所・氏名<span class="required">必須</span></label>
+        <input type="text" name="shoyu" placeholder="下関市竹崎町1丁目1番1号　山田太郎" required>
+      </div>
+    </div>
+
+    <!-- 変更理由 -->
+    <div class="card">
+      <h2>変更理由</h2>
+      <div class="field">
+        <label>変更理由の詳細<span class="required">必須</span></label>
+        <textarea name="henko_riyu" placeholder="変更理由及び早急に変更をする理由等を詳しくご記入ください" required></textarea>
+      </div>
+    </div>
+
+    <button type="submit" class="submit-btn">農業振興地域整備計画変更申出書を作成してダウンロード</button>
+    <p class="note">ボタンを押すとWordファイルが自動的にダウンロードされます</p>
+    <a href="/" class="back-btn" style="margin-top:16px;justify-content:center;width:100%;">← 申請書の選択に戻る</a>
+  </form>
+</div>
+
+<script>
+  function fillMonthDay() {
+    document.querySelectorAll('.month-sel').forEach(s=>{for(let m=1;m<=12;m++)s.appendChild(new Option(m,m));});
+    document.querySelectorAll('.day-sel').forEach(s=>{for(let d=1;d<=31;d++)s.appendChild(new Option(d,d));});
+  }
+  function combineDate(eraId,yearId,monthId,dayId){
+    const era=document.getElementById(eraId).value,year=document.getElementById(yearId).value,
+          month=document.getElementById(monthId).value,day=document.getElementById(dayId).value;
+    return(year&&month&&day)?`${era}${year}年${month}月${day}日`:'';
+  }
+  async function searchZip(zipId,addrId){
+    const zipEl=document.getElementById(zipId),msgEl=document.getElementById(zipId+'_msg'),addrEl=document.getElementById(addrId);
+    const zip=zipEl.value.replace(/-/g,'').replace(/[０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0));
+    if(zip.length!==7||!/^\d{7}$/.test(zip)){msgEl.textContent='7桁の数字で入力してください';msgEl.className='zip-msg err';return;}
+    msgEl.textContent='検索中...';msgEl.className='zip-msg loading';
+    try{const res=await fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${zip}`);const data=await res.json();
+      if(data.results&&data.results.length>0){const r=data.results[0];addrEl.value=r.address1+r.address2+r.address3;msgEl.textContent='住所が見つかりました。番地を追記してください。';msgEl.className='zip-msg ok';}
+      else{msgEl.textContent='該当する住所が見つかりませんでした。';msgEl.className='zip-msg err';}}
+    catch{msgEl.textContent='検索に失敗しました。手動で入力してください。';msgEl.className='zip-msg err';}
+  }
+  ['zip1','zip2'].forEach(id=>{
+    const t={zip1:'jusho1_input',zip2:'jusho2_input'};
+    document.getElementById(id).addEventListener('input',e=>{if(e.target.value.replace(/-/g,'').length===7)searchZip(id,t[id]);});
+    document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();searchZip(id,t[id]);}});
+  });
+  function toggleDaiko(){
+    const sec=document.getElementById('daiko_section');
+    const icon=document.getElementById('daiko_icon');
+    const open=sec.style.display==='none';
+    sec.style.display=open?'':'none';
+    icon.textContent=open?'−':'＋';
+  }
+  document.getElementById('mainForm').addEventListener('submit',function(e){
+    const d=combineDate('moushide_era','moushide_year','moushide_month','moushide_day');
+    if(!d){e.preventDefault();alert('申出日を入力してください。');return;}
+    document.getElementById('h_moushide_date').value=d;
+  });
+  fillMonthDay();
+  const today=new Date();
+  document.getElementById('moushide_year').value=today.getFullYear()-2018;
+  document.getElementById('moushide_month').value=today.getMonth()+1;
+  document.getElementById('moushide_day').value=today.getDate();
+</script>
+
+</body>
+</html>

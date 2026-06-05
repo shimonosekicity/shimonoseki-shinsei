@@ -8,6 +8,7 @@ app = Flask(__name__)
 TEIJUU_TEMPLATE   = os.path.join(os.path.dirname(__file__), "teijuu_template.docx")
 SHUSSAN_TEMPLATE  = os.path.join(os.path.dirname(__file__), "shussan_template.docx")
 SUIDO_SYOYUSHA    = os.path.join(os.path.dirname(__file__), "suido_syoyusha_template.docx")
+NOSHIN_MOUSHIDE   = os.path.join(os.path.dirname(__file__), "noshin_moushide_template.docx")
 KOUMINKAN_SHIYO   = os.path.join(os.path.dirname(__file__), "kouminkan_shiyo_template.docx")
 KOUMINKAN_GENMEN  = os.path.join(os.path.dirname(__file__), "kouminkan_genmen_template.docx")
 KOUMINKAN_CHUSHI  = os.path.join(os.path.dirname(__file__), "kouminkan_chushi_template.docx")
@@ -78,6 +79,42 @@ def generate_shussan():
     safe_name = context["shimei"].replace(" ", "_").replace("　", "_")
     return send_file(buffer, as_attachment=True,
                      download_name=f"出産祝い金支給申請書_{safe_name}.docx",
+                     mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+
+
+@app.route("/noshin", methods=["GET"])
+def noshin():
+    return render_template("noshin.html")
+
+
+@app.route("/generate_noshin_moushide", methods=["POST"])
+def generate_noshin_moushide():
+    context = {
+        "moushide_date":    request.form.get("moushide_date", ""),
+        "shinshutsu_zip":   request.form.get("shinshutsu_zip", ""),
+        "shinshutsu_jusho": request.form.get("shinshutsu_jusho", ""),
+        "shinshutsu_tel":   request.form.get("shinshutsu_tel", ""),
+        "shinshutsu_shimei": request.form.get("shinshutsu_shimei", ""),
+        "daiko_zip":        request.form.get("daiko_zip", ""),
+        "daiko_jusho":      request.form.get("daiko_jusho", ""),
+        "daiko_tel":        request.form.get("daiko_tel", ""),
+        "daiko_shimei":     request.form.get("daiko_shimei", ""),
+        "oaza":             request.form.get("oaza", ""),
+        "aza":              request.form.get("aza", ""),
+        "chiban":           request.form.get("chiban", ""),
+        "chimoku":          request.form.get("chimoku", ""),
+        "menseki":          request.form.get("menseki", ""),
+        "shoyu":            request.form.get("shoyu", ""),
+        "henko_riyu":       request.form.get("henko_riyu", ""),
+    }
+    doc = DocxTemplate(NOSHIN_MOUSHIDE)
+    doc.render(context)
+    buffer = io.BytesIO()
+    doc.save(buffer)
+    buffer.seek(0)
+    safe = context["shinshutsu_shimei"].replace(" ", "_").replace("　", "_") or "申請者"
+    return send_file(buffer, as_attachment=True,
+                     download_name=f"農業振興地域整備計画変更申出書_{safe}.docx",
                      mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
 
