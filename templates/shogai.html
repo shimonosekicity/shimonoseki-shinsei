@@ -111,6 +111,58 @@
       </div>
     </div>
 
+    <!-- 事業の種類 -->
+    <div class="card">
+      <h2>事業の種類</h2>
+      <div class="field">
+        <label>種類<span class="required">必須</span></label>
+        <select name="jigyo_shurui" required>
+          <option value="">選択してください</option>
+          <option value="障害福祉サービス事業">障害福祉サービス事業</option>
+          <option value="相談支援事業">相談支援事業</option>
+          <option value="福祉ホームを経営する事業">福祉ホームを経営する事業</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>事業の内容<span class="required">必須</span><span class="hint">具体的なサービス内容</span></label>
+        <textarea name="jigyo_naiyou" placeholder="例：居宅介護（身体介護・家事援助・移動介護）&#10;対象：身体障害者・知的障害者・精神障害者" required></textarea>
+      </div>
+    </div>
+
+    <!-- 経営者情報 -->
+    <div class="card">
+      <h2>経営者の氏名及び住所</h2>
+      <div class="field">
+        <label>氏名（名称）<span class="required">必須</span></label>
+        <input type="text" name="keieisha_shimei" placeholder="例：山田太郎 / 社会福祉法人〇〇会" required>
+      </div>
+      <div class="field">
+        <label>住所（所在地）<span class="required">必須</span></label>
+        <input type="text" name="keieisha_jusho" placeholder="下関市竹崎町1丁目1番1号" required>
+      </div>
+    </div>
+
+    <!-- 施設情報（任意） -->
+    <div class="card">
+      <h2>施設情報<span style="font-size:0.78rem;font-weight:400;color:#a0aec0;margin-left:8px">（施設がある場合のみ）</span></h2>
+      <div class="field">
+        <label>施設の名称</label>
+        <input type="text" name="shisetsu_meisho" placeholder="例：〇〇ケアホーム">
+      </div>
+      <div class="field">
+        <label>施設の種類</label>
+        <input type="text" name="shisetsu_shurui" placeholder="例：グループホーム・自立訓練施設">
+      </div>
+      <div class="field">
+        <label>施設の所在地</label>
+        <input type="text" name="shisetsu_shozaichi" placeholder="下関市竹崎町1丁目1番1号">
+      </div>
+      <div class="field">
+        <label>入所定員（人）</label>
+        <input type="text" name="nyusho_teiin" placeholder="例：10">
+      </div>
+    </div>
+
     <!-- 事業開始予定日 -->
     <div class="card">
       <h2>事業開始の予定年月日</h2>

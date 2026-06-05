@@ -189,10 +189,100 @@
 
     <!-- 変更理由 -->
     <div class="card">
-      <h2>変更理由</h2>
+      <h2>２．変更理由</h2>
       <div class="field">
-        <label>変更理由の詳細<span class="required">必須</span></label>
-        <textarea name="henko_riyu" placeholder="変更理由及び早急に変更をする理由等を詳しくご記入ください" required></textarea>
+        <label>変更理由の詳細<span class="required">必須</span><span class="hint">変更理由及び早急に変更する理由等</span></label>
+        <textarea name="henko_riyu" placeholder="例：自宅建築のため農用地区域からの除外が必要。当該地は農業振興地域内にあるが、隣接地に建築可能な宅地がなく…" required></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>３．当該地を選定した理由</h2>
+      <div class="field">
+        <label>選定理由<span class="required">必須</span></label>
+        <textarea name="sentei_riyu" placeholder="例：当該地は農地として利用されているが、周辺に代替地がなく…"></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>４．変更する農用地区域の状況</h2>
+      <div class="field">
+        <label>農用地の状況<span class="hint">田・畑の収穫量、品目など</span></label>
+        <textarea name="nochi_jokyo" placeholder="例：田：10a当たり米収穫量500kg&#10;畑：野菜（キャベツ、白菜）"></textarea>
+      </div>
+      <div class="field">
+        <label>農業公共投資事業の整備状況</label>
+        <textarea name="koko_toshi" placeholder="例：有・ほ場整備事業（完了年月日：令和〇年〇月〇日）&#10;無"></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>５．変更が周辺農地へ及ぼす影響</h2>
+      <div class="field">
+        <label>汚悪水の処理方法</label>
+        <input type="text" name="osui_shori" placeholder="例：合併浄化槽による処理">
+      </div>
+      <div class="field">
+        <label>日照関係</label>
+        <input type="text" name="nicchou" placeholder="例：周辺農地への日照影響なし">
+      </div>
+      <div class="field">
+        <label>その他影響</label>
+        <textarea name="sonota_eikyou" placeholder="例：農道や水路への影響なし"></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>６．事業計画の内容</h2>
+      <div class="field">
+        <label>事業主体の氏名・住所</label>
+        <input type="text" name="jigyo_shutai" placeholder="例：山田太郎 下関市竹崎町1丁目1番1号（地権者本人、会社員）">
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>農用地区域内面積（㎡）</label>
+          <input type="text" name="kuiki_nai_menseki" placeholder="500">
+        </div>
+        <div class="field">
+          <label>農用地区域外面積（㎡）</label>
+          <input type="text" name="kuiki_gai_menseki" placeholder="0">
+        </div>
+      </div>
+      <div class="field">
+        <label>施設等の面積・構造</label>
+        <textarea name="shisetsu_menseki" placeholder="例：木造2階建、建築面積80㎡、延床面積120㎡"></textarea>
+      </div>
+      <div class="field">
+        <label>事業費（円）</label>
+        <input type="text" name="jigyo_hi" placeholder="例：15,000,000">
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>７．農業経営の状況</h2>
+      <div class="field">
+        <label>田（㎡）</label>
+        <div class="row">
+          <div class="field"><label style="font-size:0.78rem">現在</label><input type="text" name="ta_genzai" placeholder="1000"></div>
+          <div class="field"><label style="font-size:0.78rem">変更後</label><input type="text" name="ta_ato" placeholder="500"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label>畑（㎡）</label>
+        <div class="row">
+          <div class="field"><label style="font-size:0.78rem">現在</label><input type="text" name="hata_genzai" placeholder="500"></div>
+          <div class="field"><label style="font-size:0.78rem">変更後</label><input type="text" name="hata_ato" placeholder="500"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label>専業・兼業の区別</label>
+        <select name="senkyo_kenbyo">
+          <option value="">選択してください</option>
+          <option value="専業">専業</option>
+          <option value="第１種兼業">第１種兼業</option>
+          <option value="第２種兼業">第２種兼業</option>
+          <option value="その他">その他</option>
+        </select>
       </div>
     </div>
 

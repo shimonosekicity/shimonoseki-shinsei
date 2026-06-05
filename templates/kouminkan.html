@@ -58,6 +58,13 @@
 
     .note-box { background: #fef9e7; border: 1.5px solid #f6c90e; border-radius: 8px; padding: 12px 16px; font-size: 0.82rem; color: #744210; margin-top: -4px; margin-bottom: 16px; }
 
+    /* 使用日程テーブル */
+    .schedule-row { border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 14px; margin-bottom: 10px; position: relative; }
+    .schedule-row .row-num { font-size: 0.78rem; font-weight: 700; color: #5a3e8e; margin-bottom: 10px; }
+    .schedule-row .delete-btn { position: absolute; top: 10px; right: 10px; background: none; border: none; color: #e53e3e; cursor: pointer; font-size: 1.1rem; }
+    .schedule-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .schedule-grid .full { grid-column: 1 / -1; }
+
     .back-btn {
       display: inline-flex; align-items: center; gap: 6px;
       margin-bottom: 16px; padding: 10px 18px;
@@ -183,9 +190,12 @@
       </div>
     </div>
 
-    <!-- 注意書き -->
-    <div class="note-box" id="note_datetime">
-      📅 <strong>使用日時・使用室名・時間帯</strong>はダウンロード後、Wordファイルに直接ご記入ください。
+    <!-- 使用日程（申請書・減免申請書のみ） -->
+    <div class="card" id="card_datetime">
+      <h2>使用日程（最大5件）</h2>
+      <div id="schedule_rows"></div>
+      <button type="button" id="add_row_btn" onclick="addScheduleRow()" style="margin-top:10px;padding:8px 16px;background:#f0e9ff;border:1.5px solid #5a3e8e;border-radius:8px;color:#5a3e8e;font-weight:600;cursor:pointer;font-family:inherit;font-size:0.875rem;">＋ 日程を追加</button>
+      <p style="font-size:0.75rem;color:#a0aec0;margin-top:8px;">最大5件まで追加できます</p>
     </div>
 
     <button type="submit" class="submit-btn" id="submit_btn">申請書を作成してダウンロード</button>
@@ -204,7 +214,7 @@
     });
     const showShiyou = type !== 'chushi';
     document.getElementById('card_shiyou').style.display = showShiyou ? '' : 'none';
-    document.getElementById('note_datetime').style.display = showShiyou ? '' : 'none';
+    document.getElementById('card_datetime').style.display = showShiyou ? '' : 'none';
     document.getElementById('note_chushi').style.display = type === 'chushi' ? '' : 'none';
 
     const actions = {
@@ -254,6 +264,73 @@
     if(!shinsei){e.preventDefault();alert('申請日を入力してください。');return;}
     document.getElementById('h_shinsei_date').value = shinsei;
   });
+
+  // ── 使用日程の追加 ──────────────────────────────────
+  let scheduleCount = 0;
+
+  const TIME_OPTIONS = [
+    { value: '', label: '選択してください' },
+    { value: '午前', label: '午前（9:00〜12:00）' },
+    { value: '午前・延長', label: '午前＋延長（9:00〜13:00）' },
+    { value: '午後', label: '午後（13:00〜17:00）' },
+    { value: '午後・延長', label: '午後＋延長（13:00〜18:00）' },
+    { value: '夜間', label: '夜間（18:00〜22:00）' },
+    { value: '午前・午後', label: '午前・午後（9:00〜17:00）' },
+    { value: '午前・午後・夜間', label: '終日（9:00〜22:00）' },
+  ];
+
+  function addScheduleRow() {
+    if (scheduleCount >= 5) { alert('日程は最大5件まで入力できます。'); return; }
+    scheduleCount++;
+    const n = scheduleCount;
+    const timeOpts = TIME_OPTIONS.map(o =>
+      `<option value="${o.value}">${o.label}</option>`
+    ).join('');
+
+    const row = document.createElement('div');
+    row.className = 'schedule-row';
+    row.id = `schedule_row_${n}`;
+    row.innerHTML = `
+      <div class="row-num">${n}件目</div>
+      <button type="button" class="delete-btn" onclick="deleteScheduleRow(${n})">✕</button>
+      <div class="schedule-grid">
+        <div class="field">
+          <label>使用年月日<span style="color:#e53e3e;font-size:0.75rem;margin-left:4px">必須</span></label>
+          <input type="text" name="date_${n}" placeholder="例：令和8年6月15日" required>
+        </div>
+        <div class="field">
+          <label>使用室名<span style="color:#e53e3e;font-size:0.75rem;margin-left:4px">必須</span></label>
+          <input type="text" name="room_${n}" placeholder="例：会議室、和室" required>
+        </div>
+        <div class="field">
+          <label>時間帯<span style="color:#e53e3e;font-size:0.75rem;margin-left:4px">必須</span></label>
+          <select name="time_${n}" required>
+            ${timeOpts}
+          </select>
+        </div>
+        <div class="field">
+          <label>摘要<span style="color:#a0aec0;font-size:0.75rem;margin-left:4px">任意</span></label>
+          <input type="text" name="biko_${n}" placeholder="例：定例会議">
+        </div>
+      </div>`;
+
+    document.getElementById('schedule_rows').appendChild(row);
+    if (scheduleCount >= 5) {
+      document.getElementById('add_row_btn').disabled = true;
+      document.getElementById('add_row_btn').style.opacity = '0.5';
+    }
+  }
+
+  function deleteScheduleRow(n) {
+    const row = document.getElementById(`schedule_row_${n}`);
+    if (row) row.remove();
+    scheduleCount = Math.max(0, scheduleCount - 1);
+    document.getElementById('add_row_btn').disabled = false;
+    document.getElementById('add_row_btn').style.opacity = '1';
+  }
+
+  // 初期状態で1件追加
+  addScheduleRow();
 
   fillMonthDay();
   const today = new Date();

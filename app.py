@@ -98,9 +98,17 @@ def generate_shogai_jigyo():
         "meisho":       request.form.get("meisho", ""),
         "daihyo":       request.form.get("daihyo", ""),
         "tel":          request.form.get("tel", ""),
-        "kaishi_nen":   request.form.get("kaishi_nen", ""),
-        "kaishi_tsuki": request.form.get("kaishi_tsuki", ""),
-        "kaishi_hi":    request.form.get("kaishi_hi", ""),
+        "kaishi_nen":        request.form.get("kaishi_nen", ""),
+        "kaishi_tsuki":      request.form.get("kaishi_tsuki", ""),
+        "kaishi_hi":         request.form.get("kaishi_hi", ""),
+        "jigyo_shurui":      request.form.get("jigyo_shurui", ""),
+        "jigyo_naiyou":      request.form.get("jigyo_naiyou", ""),
+        "keieisha_shimei":   request.form.get("keieisha_shimei", ""),
+        "keieisha_jusho":    request.form.get("keieisha_jusho", ""),
+        "shisetsu_meisho":   request.form.get("shisetsu_meisho", ""),
+        "shisetsu_shurui":   request.form.get("shisetsu_shurui", ""),
+        "shisetsu_shozaichi": request.form.get("shisetsu_shozaichi", ""),
+        "nyusho_teiin":      request.form.get("nyusho_teiin", ""),
     }
     doc = DocxTemplate(SHOGAI_JIGYO)
     doc.render(context)
@@ -137,6 +145,23 @@ def generate_noshin_moushide():
         "menseki":          request.form.get("menseki", ""),
         "shoyu":            request.form.get("shoyu", ""),
         "henko_riyu":       request.form.get("henko_riyu", ""),
+        # セクション3〜7
+        "sentei_riyu":      request.form.get("sentei_riyu", ""),
+        "nochi_jokyo":      request.form.get("nochi_jokyo", ""),
+        "koko_toshi":       request.form.get("koko_toshi", ""),
+        "osui_shori":       request.form.get("osui_shori", ""),
+        "nicchou":          request.form.get("nicchou", ""),
+        "sonota_eikyou":    request.form.get("sonota_eikyou", ""),
+        "jigyo_shutai":     request.form.get("jigyo_shutai", ""),
+        "kuiki_nai_menseki": request.form.get("kuiki_nai_menseki", ""),
+        "kuiki_gai_menseki": request.form.get("kuiki_gai_menseki", ""),
+        "shisetsu_menseki": request.form.get("shisetsu_menseki", ""),
+        "jigyo_hi":         request.form.get("jigyo_hi", ""),
+        "ta_genzai":        request.form.get("ta_genzai", ""),
+        "ta_ato":           request.form.get("ta_ato", ""),
+        "hata_genzai":      request.form.get("hata_genzai", ""),
+        "hata_ato":         request.form.get("hata_ato", ""),
+        "senkyo_kenbyo":    request.form.get("senkyo_kenbyo", ""),
     }
     doc = DocxTemplate(NOSHIN_MOUSHIDE)
     doc.render(context)
@@ -186,7 +211,7 @@ def kouminkan():
 
 
 def _kouminkan_context():
-    return {
+    ctx = {
         "shinsei_date":   request.form.get("shinsei_date", ""),
         "kouminkan_name": request.form.get("kouminkan_name", ""),
         "jusho":          request.form.get("jusho", ""),
@@ -196,6 +221,13 @@ def _kouminkan_context():
         "shiyou_mokuteki": request.form.get("shiyou_mokuteki", ""),
         "shiyou_ninzu":   request.form.get("shiyou_ninzu", ""),
     }
+    # 使用日程（5行分）
+    for i in range(1, 6):
+        ctx[f"date_{i}"]  = request.form.get(f"date_{i}", "")
+        ctx[f"room_{i}"]  = request.form.get(f"room_{i}", "")
+        ctx[f"time_{i}"]  = request.form.get(f"time_{i}", "")
+        ctx[f"biko_{i}"]  = request.form.get(f"biko_{i}", "")
+    return ctx
 
 
 @app.route("/generate_kouminkan_shiyo", methods=["POST"])
