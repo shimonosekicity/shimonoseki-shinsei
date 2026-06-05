@@ -9,6 +9,7 @@ TEIJUU_TEMPLATE   = os.path.join(os.path.dirname(__file__), "teijuu_template.doc
 SHUSSAN_TEMPLATE  = os.path.join(os.path.dirname(__file__), "shussan_template.docx")
 SUIDO_SYOYUSHA    = os.path.join(os.path.dirname(__file__), "suido_syoyusha_template.docx")
 NOSHIN_MOUSHIDE   = os.path.join(os.path.dirname(__file__), "noshin_moushide_template.docx")
+SHOGAI_JIGYO      = os.path.join(os.path.dirname(__file__), "shogai_jigyo_template.docx")
 KOUMINKAN_SHIYO   = os.path.join(os.path.dirname(__file__), "kouminkan_shiyo_template.docx")
 KOUMINKAN_GENMEN  = os.path.join(os.path.dirname(__file__), "kouminkan_genmen_template.docx")
 KOUMINKAN_CHUSHI  = os.path.join(os.path.dirname(__file__), "kouminkan_chushi_template.docx")
@@ -79,6 +80,36 @@ def generate_shussan():
     safe_name = context["shimei"].replace(" ", "_").replace("　", "_")
     return send_file(buffer, as_attachment=True,
                      download_name=f"出産祝い金支給申請書_{safe_name}.docx",
+                     mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+
+
+@app.route("/shogai", methods=["GET"])
+def shogai():
+    return render_template("shogai.html")
+
+
+@app.route("/generate_shogai_jigyo", methods=["POST"])
+def generate_shogai_jigyo():
+    context = {
+        "todoke_nen":   request.form.get("todoke_nen", ""),
+        "todoke_tsuki": request.form.get("todoke_tsuki", ""),
+        "todoke_hi":    request.form.get("todoke_hi", ""),
+        "shozaichi":    request.form.get("shozaichi", ""),
+        "meisho":       request.form.get("meisho", ""),
+        "daihyo":       request.form.get("daihyo", ""),
+        "tel":          request.form.get("tel", ""),
+        "kaishi_nen":   request.form.get("kaishi_nen", ""),
+        "kaishi_tsuki": request.form.get("kaishi_tsuki", ""),
+        "kaishi_hi":    request.form.get("kaishi_hi", ""),
+    }
+    doc = DocxTemplate(SHOGAI_JIGYO)
+    doc.render(context)
+    buffer = io.BytesIO()
+    doc.save(buffer)
+    buffer.seek(0)
+    safe = context["meisho"].replace(" ", "_").replace("　", "_") or "届出者"
+    return send_file(buffer, as_attachment=True,
+                     download_name=f"障害福祉サービス事業等開始届_{safe}.docx",
                      mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
 
