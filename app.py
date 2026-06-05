@@ -5,8 +5,11 @@ from flask import Flask, render_template, request, send_file
 
 app = Flask(__name__)
 
-TEIJUU_TEMPLATE  = os.path.join(os.path.dirname(__file__), "teijuu_template.docx")
-SHUSSAN_TEMPLATE = os.path.join(os.path.dirname(__file__), "shussan_template.docx")
+TEIJUU_TEMPLATE   = os.path.join(os.path.dirname(__file__), "teijuu_template.docx")
+SHUSSAN_TEMPLATE  = os.path.join(os.path.dirname(__file__), "shussan_template.docx")
+KOUMINKAN_SHIYO   = os.path.join(os.path.dirname(__file__), "kouminkan_shiyo_template.docx")
+KOUMINKAN_GENMEN  = os.path.join(os.path.dirname(__file__), "kouminkan_genmen_template.docx")
+KOUMINKAN_CHUSHI  = os.path.join(os.path.dirname(__file__), "kouminkan_chushi_template.docx")
 
 
 @app.route("/", methods=["GET"])
@@ -74,6 +77,73 @@ def generate_shussan():
     safe_name = context["shimei"].replace(" ", "_").replace("　", "_")
     return send_file(buffer, as_attachment=True,
                      download_name=f"出産祝い金支給申請書_{safe_name}.docx",
+                     mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+
+
+@app.route("/kouminkan", methods=["GET"])
+def kouminkan():
+    return render_template("kouminkan.html")
+
+
+def _kouminkan_context():
+    return {
+        "shinsei_date":   request.form.get("shinsei_date", ""),
+        "kouminkan_name": request.form.get("kouminkan_name", ""),
+        "jusho":          request.form.get("jusho", ""),
+        "dantai_name":    request.form.get("dantai_name", ""),
+        "daihyo_name":    request.form.get("daihyo_name", ""),
+        "denwa":          request.form.get("denwa", ""),
+        "shiyou_mokuteki": request.form.get("shiyou_mokuteki", ""),
+        "shiyou_ninzu":   request.form.get("shiyou_ninzu", ""),
+    }
+
+
+@app.route("/generate_kouminkan_shiyo", methods=["POST"])
+def generate_kouminkan_shiyo():
+    context = _kouminkan_context()
+    doc = DocxTemplate(KOUMINKAN_SHIYO)
+    doc.render(context)
+    buffer = io.BytesIO()
+    doc.save(buffer)
+    buffer.seek(0)
+    safe = context["dantai_name"].replace(" ", "_").replace("　", "_") or "申請者"
+    return send_file(buffer, as_attachment=True,
+                     download_name=f"公民館使用許可申請書_{safe}.docx",
+                     mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+
+
+@app.route("/generate_kouminkan_genmen", methods=["POST"])
+def generate_kouminkan_genmen():
+    context = _kouminkan_context()
+    doc = DocxTemplate(KOUMINKAN_GENMEN)
+    doc.render(context)
+    buffer = io.BytesIO()
+    doc.save(buffer)
+    buffer.seek(0)
+    safe = context["dantai_name"].replace(" ", "_").replace("　", "_") or "申請者"
+    return send_file(buffer, as_attachment=True,
+                     download_name=f"公民館使用料減免申請書_{safe}.docx",
+                     mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+
+
+@app.route("/generate_kouminkan_chushi", methods=["POST"])
+def generate_kouminkan_chushi():
+    ctx = {
+        "shinsei_date":   request.form.get("shinsei_date", ""),
+        "kouminkan_name": request.form.get("kouminkan_name", ""),
+        "jusho":          request.form.get("jusho", ""),
+        "dantai_name":    request.form.get("dantai_name", ""),
+        "daihyo_name":    request.form.get("daihyo_name", ""),
+        "denwa":          request.form.get("denwa", ""),
+    }
+    doc = DocxTemplate(KOUMINKAN_CHUSHI)
+    doc.render(ctx)
+    buffer = io.BytesIO()
+    doc.save(buffer)
+    buffer.seek(0)
+    safe = ctx["dantai_name"].replace(" ", "_").replace("　", "_") or "申請者"
+    return send_file(buffer, as_attachment=True,
+                     download_name=f"公民館使用中止届_{safe}.docx",
                      mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
 
