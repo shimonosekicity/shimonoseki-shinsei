@@ -7,6 +7,7 @@ app = Flask(__name__)
 
 TEIJUU_TEMPLATE   = os.path.join(os.path.dirname(__file__), "teijuu_template.docx")
 SHUSSAN_TEMPLATE  = os.path.join(os.path.dirname(__file__), "shussan_template.docx")
+SUIDO_SYOYUSHA    = os.path.join(os.path.dirname(__file__), "suido_syoyusha_template.docx")
 KOUMINKAN_SHIYO   = os.path.join(os.path.dirname(__file__), "kouminkan_shiyo_template.docx")
 KOUMINKAN_GENMEN  = os.path.join(os.path.dirname(__file__), "kouminkan_genmen_template.docx")
 KOUMINKAN_CHUSHI  = os.path.join(os.path.dirname(__file__), "kouminkan_chushi_template.docx")
@@ -77,6 +78,37 @@ def generate_shussan():
     safe_name = context["shimei"].replace(" ", "_").replace("　", "_")
     return send_file(buffer, as_attachment=True,
                      download_name=f"出産祝い金支給申請書_{safe_name}.docx",
+                     mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+
+
+@app.route("/suido", methods=["GET"])
+def suido():
+    return render_template("suido.html")
+
+
+@app.route("/generate_suido_syoyusha", methods=["POST"])
+def generate_suido_syoyusha():
+    context = {
+        "todoke_date":        request.form.get("todoke_date", ""),
+        "shutsu_jusho":       request.form.get("shutsu_jusho", ""),
+        "shutsu_shimei":      request.form.get("shutsu_shimei", ""),
+        "settichi":           request.form.get("settichi", ""),
+        "settichi_tatemono":  request.form.get("settichi_tatemono", ""),
+        "jyoto_date":         request.form.get("jyoto_date", ""),
+        "mae_jusho":          request.form.get("mae_jusho", ""),
+        "mae_shimei":         request.form.get("mae_shimei", ""),
+        "ato_jusho":          request.form.get("ato_jusho", ""),
+        "ato_shimei":         request.form.get("ato_shimei", ""),
+        "jyoto_riyu":         request.form.get("jyoto_riyu", ""),
+    }
+    doc = DocxTemplate(SUIDO_SYOYUSHA)
+    doc.render(context)
+    buffer = io.BytesIO()
+    doc.save(buffer)
+    buffer.seek(0)
+    safe = context["ato_shimei"].replace(" ", "_").replace("　", "_") or "申請者"
+    return send_file(buffer, as_attachment=True,
+                     download_name=f"排水設備所有者変更届_{safe}.docx",
                      mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
 
