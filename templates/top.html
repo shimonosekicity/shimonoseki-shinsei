@@ -6,170 +6,253 @@
   <title>下関市 申請書作成サービス</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: "Hiragino Sans", "Meiryo", sans-serif;
-      background: #f0f4f8;
-      color: #2d3748;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+    body { font-family: "Hiragino Sans", "Meiryo", sans-serif; background: #f0f4f8; color: #2d3748; min-height: 100vh; }
+
+    header { background: #1a3a5c; color: white; padding: 24px; text-align: center; }
+    header .logo { font-size: 0.8rem; opacity: 0.7; letter-spacing: 0.12em; margin-bottom: 6px; }
+    header h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: 0.05em; }
+    header p { margin-top: 6px; font-size: 0.85rem; opacity: 0.8; }
+
+    .container { max-width: 900px; margin: 0 auto; padding: 32px 16px 48px; }
+
+    .section { margin-bottom: 32px; }
+    .section-title {
+      font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em;
+      color: #718096; text-transform: uppercase;
+      border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 16px;
     }
-    header {
-      background: #1a3a5c;
-      color: white;
-      padding: 24px;
-      text-align: center;
-    }
-    header .logo {
-      font-size: 0.85rem;
-      opacity: 0.75;
-      letter-spacing: 0.1em;
-      margin-bottom: 6px;
-    }
-    header h1 {
-      font-size: 1.4rem;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-    }
-    header p {
-      margin-top: 6px;
-      font-size: 0.85rem;
-      opacity: 0.8;
-    }
-    main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 40px 16px;
-    }
-    .lead {
-      text-align: center;
-      margin-bottom: 36px;
-    }
-    .lead h2 {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: #2d3748;
-      margin-bottom: 8px;
-    }
-    .lead p {
-      font-size: 0.875rem;
-      color: #718096;
-    }
-    .cards {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-      justify-content: center;
-      width: 100%;
-      max-width: 680px;
-    }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+
     .card {
-      flex: 1;
-      min-width: 260px;
-      max-width: 310px;
-      background: white;
-      border-radius: 16px;
-      padding: 32px 28px;
-      text-decoration: none;
-      color: inherit;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      border: 2px solid transparent;
+      background: white; border-radius: 12px; padding: 20px;
+      border: 1.5px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      display: flex; flex-direction: column; gap: 8px;
+      text-decoration: none; color: inherit;
       transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
+      position: relative;
     }
-    .card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    .card.available:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+      border-color: #1a56a0;
     }
-    .card.teijuu { border-color: #1a56a0; }
-    .card.teijuu:hover { border-color: #1a56a0; }
-    .card.shussan { border-color: #276749; }
-    .card.shussan:hover { border-color: #276749; }
-    .card-icon {
-      font-size: 2.4rem;
-      line-height: 1;
+    .card.disabled { opacity: 0.55; cursor: default; }
+    .card.disabled:hover { transform: none; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+    .card-icon { font-size: 1.6rem; line-height: 1; flex-shrink: 0; }
+    .badge {
+      font-size: 0.65rem; font-weight: 700; padding: 2px 7px;
+      border-radius: 20px; white-space: nowrap; flex-shrink: 0;
     }
-    .card-badge {
-      display: inline-block;
-      font-size: 0.7rem;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 20px;
-      letter-spacing: 0.05em;
-      width: fit-content;
-    }
-    .teijuu .card-badge { background: #ebf4ff; color: #1a56a0; }
-    .shussan .card-badge { background: #f0fff4; color: #276749; }
-    .card h3 {
-      font-size: 1.1rem;
-      font-weight: 700;
-      line-height: 1.4;
-    }
-    .teijuu h3 { color: #1a3a5c; }
-    .shussan h3 { color: #1a3a2c; }
-    .card p {
-      font-size: 0.82rem;
-      color: #718096;
-      line-height: 1.6;
-    }
+    .badge-available { background: #ebf4ff; color: #1a56a0; }
+    .badge-soon { background: #f7fafc; color: #a0aec0; border: 1px solid #e2e8f0; }
+
+    .card-dept { font-size: 0.72rem; color: #a0aec0; }
+    .card-title { font-size: 0.95rem; font-weight: 700; color: #2d3748; line-height: 1.4; }
     .card-btn {
-      margin-top: auto;
-      padding: 11px 0;
-      border-radius: 8px;
-      font-size: 0.875rem;
-      font-weight: 700;
-      text-align: center;
-      letter-spacing: 0.03em;
+      margin-top: 6px; padding: 8px 0;
+      background: #1a56a0; color: white;
+      border-radius: 7px; font-size: 0.8rem; font-weight: 700;
+      text-align: center; letter-spacing: 0.03em;
     }
-    .teijuu .card-btn { background: #1a56a0; color: white; }
-    .shussan .card-btn { background: #276749; color: white; }
-    footer {
-      text-align: center;
-      padding: 20px;
-      font-size: 0.78rem;
-      color: #a0aec0;
-    }
+
+    footer { text-align: center; padding: 20px; font-size: 0.75rem; color: #a0aec0; }
   </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">下関市人口定住促進対策事業</div>
+  <div class="logo">下関市</div>
   <h1>申請書作成サービス</h1>
-  <p>必要事項を入力するだけで、申請書Wordファイルを自動生成します</p>
+  <p>必要事項を入力するだけで申請書Wordファイルを自動生成します</p>
 </header>
 
-<main>
-  <div class="lead">
-    <h2>作成する申請書を選んでください</h2>
-    <p>各カードをタップして入力フォームへ進みます</p>
+<div class="container">
+
+  <!-- 定住・子育て支援 -->
+  <div class="section">
+    <div class="section-title">🏡 定住・子育て支援</div>
+    <div class="grid">
+      <a href="/teijuu" class="card available">
+        <div class="card-top">
+          <div class="card-icon">🏠</div>
+          <span class="badge badge-available">利用可能</span>
+        </div>
+        <div class="card-dept">定住促進</div>
+        <div class="card-title">定住奨励金支給申請書</div>
+        <div class="card-btn">申請書を作成する →</div>
+      </a>
+      <a href="/shussan" class="card available">
+        <div class="card-top">
+          <div class="card-icon">👶</div>
+          <span class="badge badge-available">利用可能</span>
+        </div>
+        <div class="card-dept">こどもサポート課</div>
+        <div class="card-title">出産祝い金支給申請書</div>
+        <div class="card-btn">申請書を作成する →</div>
+      </a>
+      <div class="card disabled">
+        <div class="card-top">
+          <div class="card-icon">👨‍👩‍👧</div>
+          <span class="badge badge-soon">準備中</span>
+        </div>
+        <div class="card-dept">こどもサポート課</div>
+        <div class="card-title">児童手当申請書</div>
+      </div>
+    </div>
   </div>
 
-  <div class="cards">
-
-    <a href="/teijuu" class="card teijuu">
-      <div class="card-icon">🏠</div>
-      <div class="card-badge">定住支援</div>
-      <h3>定住奨励金<br>支給申請書</h3>
-      <p>市外から下関市に転入し、定住された方が対象の奨励金申請書を作成します。</p>
-      <div class="card-btn">申請書を作成する →</div>
-    </a>
-
-    <a href="/shussan" class="card shussan">
-      <div class="card-icon">👶</div>
-      <div class="card-badge">子育て支援</div>
-      <h3>出産祝い金<br>支給申請書</h3>
-      <p>下関市でお子さんが生まれた方が対象の出産祝い金申請書を作成します。</p>
-      <div class="card-btn">申請書を作成する →</div>
-    </a>
-
+  <!-- 保険・医療・福祉 -->
+  <div class="section">
+    <div class="section-title">🏥 保険・医療・福祉</div>
+    <div class="grid">
+      <div class="card disabled">
+        <div class="card-top">
+          <div class="card-icon">🏥</div>
+          <span class="badge badge-soon">準備中</span>
+        </div>
+        <div class="card-dept">保険年金課</div>
+        <div class="card-title">国民健康保険申請書</div>
+      </div>
+      <div class="card disabled">
+        <div class="card-top">
+          <div class="card-icon">🧓</div>
+          <span class="badge badge-soon">準備中</span>
+        </div>
+        <div class="card-dept">介護保険課</div>
+        <div class="card-title">給付認定申請書</div>
+      </div>
+      <div class="card disabled">
+        <div class="card-top">
+          <div class="card-icon">♿</div>
+          <span class="badge badge-soon">準備中</span>
+        </div>
+        <div class="card-dept">障害者支援課</div>
+        <div class="card-title">障害福祉サービス申請書</div>
+      </div>
+    </div>
   </div>
-</main>
+
+  <!-- 税務 -->
+  <div class="section">
+    <div class="section-title">📋 税務</div>
+    <div class="grid">
+      <div class="card disabled">
+        <div class="card-top">
+          <div class="card-icon">📝</div>
+          <span class="badge badge-soon">準備中</span>
+        </div>
+        <div class="card-dept">市民税課</div>
+        <div class="card-title">市県民税申告書</div>
+      </div>
+      <div class="card disabled">
+        <div class="card-top">
+          <div class="card-icon">🏘️</div>
+          <span class="badge badge-soon">準備中</span>
+        </div>
+        <div class="card-dept">資産税課</div>
+        <div class="card-title">固定資産税申請書</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 建築・開発・道路 -->
+  <div class="section">
+    <div class="section-title">🏗️ 建築・開発・道路</div>
+    <div class="grid">
+      <div class="card disabled">
+        <div class="card-top">
+          <div class="card-icon">🏢</div>
+          <span class="badge badge-soon">準備中</span>
+        </div>
+        <div class="card-dept">建築指導課</div>
+        <div class="card-title">建築確認申請書</div>
+      </div>
+      <div class="card disabled">
+        <div class="card-top">
+          <div class="card-icon">🌐</div>
+          <span class="badge badge-soon">準備中</span>
+        </div>
+        <div class="card-dept">建築指導課</div>
+        <div class="card-title">開発行為許可申請書</div>
+      </div>
+      <div class="card disabled">
+        <div class="card-top">
+          <div class="card-icon">🛣️</div>
+          <span class="badge badge-soon">準備中</span>
+        </div>
+        <div class="card-dept">道路河川管理課</div>
+        <div class="card-title">道路占用許可申請書</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 消防 -->
+  <div class="section">
+    <div class="section-title">🚒 消防</div>
+    <div class="grid">
+      <div class="card disabled">
+        <div class="card-top">
+          <div class="card-icon">🔥</div>
+          <span class="badge badge-soon">準備中</span>
+        </div>
+        <div class="card-dept">消防局</div>
+        <div class="card-title">防火防災管理届出書</div>
+      </div>
+      <div class="card disabled">
+        <div class="card-top">
+          <div class="card-icon">🧯</div>
+          <span class="badge badge-soon">準備中</span>
+        </div>
+        <div class="card-dept">消防局</div>
+        <div class="card-title">火災予防条例届出書</div>
+      </div>
+      <div class="card disabled">
+        <div class="card-top">
+          <div class="card-icon">🚿</div>
+          <span class="badge badge-soon">準備中</span>
+        </div>
+        <div class="card-dept">消防局</div>
+        <div class="card-title">消防用設備等届出書</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- インフラ・農業・施設 -->
+  <div class="section">
+    <div class="section-title">🌿 インフラ・農業・施設</div>
+    <div class="grid">
+      <div class="card disabled">
+        <div class="card-top">
+          <div class="card-icon">💧</div>
+          <span class="badge badge-soon">準備中</span>
+        </div>
+        <div class="card-dept">上下水道局</div>
+        <div class="card-title">水道下水道申請書</div>
+      </div>
+      <div class="card disabled">
+        <div class="card-top">
+          <div class="card-icon">🌾</div>
+          <span class="badge badge-soon">準備中</span>
+        </div>
+        <div class="card-dept">農業委員会</div>
+        <div class="card-title">農地法申請書</div>
+      </div>
+      <div class="card disabled">
+        <div class="card-top">
+          <div class="card-icon">🏫</div>
+          <span class="badge badge-soon">準備中</span>
+        </div>
+        <div class="card-dept">公民館</div>
+        <div class="card-title">施設使用申請書</div>
+      </div>
+    </div>
+  </div>
+
+</div>
 
 <footer>
   このサービスは申請書の作成を補助するものです。内容は必ずご確認の上、各担当窓口へ提出してください。
