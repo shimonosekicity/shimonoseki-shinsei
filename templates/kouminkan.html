@@ -1,98 +1,10 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>公民館申請書 作成フォーム</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: "Hiragino Sans", "Meiryo", sans-serif; background: #f0f4f8; color: #2d3748; min-height: 100vh; }
-    header { background: #5a3e8e; color: white; padding: 20px 24px; }
-    header h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: 0.03em; }
-    header p { margin-top: 4px; font-size: 0.85rem; opacity: 0.85; }
-    .container { max-width: 680px; margin: 32px auto; padding: 0 16px 48px; }
-    .card { background: white; border-radius: 12px; padding: 28px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-    .card h2 { font-size: 0.95rem; font-weight: 700; color: #5a3e8e; border-left: 4px solid #5a3e8e; padding-left: 10px; margin-bottom: 20px; }
-    .field { margin-bottom: 18px; }
-    .field:last-child { margin-bottom: 0; }
-    label { display: block; font-size: 0.875rem; font-weight: 600; color: #4a5568; margin-bottom: 6px; }
-    label .required { color: #e53e3e; margin-left: 4px; font-size: 0.75rem; }
-    label .hint { color: #a0aec0; font-weight: 400; font-size: 0.78rem; margin-left: 6px; }
-    input[type="text"], input[type="number"], select, textarea {
-      width: 100%; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 8px;
-      font-size: 0.95rem; font-family: inherit; color: #2d3748; background: #fff;
-      transition: border-color 0.2s; -webkit-appearance: none;
-    }
-    input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:focus {
-      outline: none; border-color: #5a3e8e; box-shadow: 0 0 0 3px rgba(90,62,142,0.1);
-    }
-    select {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23718096' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px;
-    }
-    textarea { resize: vertical; min-height: 80px; }
-    .row { display: flex; gap: 12px; }
-    .row .field { flex: 1; }
-    .zip-row { display: flex; gap: 8px; align-items: flex-end; margin-bottom: 10px; }
-    .zip-row input { flex: 1; max-width: 160px; }
-    .zip-btn { padding: 10px 16px; background: #e2e8f0; border: 1.5px solid #cbd5e0; border-radius: 8px; font-size: 0.875rem; font-family: inherit; color: #4a5568; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
-    .zip-btn:hover { background: #cbd5e0; }
-    .zip-msg { font-size: 0.78rem; margin-top: 4px; min-height: 18px; }
-    .zip-msg.ok { color: #38a169; } .zip-msg.err { color: #e53e3e; } .zip-msg.loading { color: #718096; }
-    .date-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-    .date-row .era-sel { width: 90px; flex-shrink: 0; }
-    .date-row .year-num { width: 68px; flex-shrink: 0; }
-    .date-row .month-sel { width: 68px; flex-shrink: 0; }
-    .date-row .day-sel { width: 68px; flex-shrink: 0; }
-    .date-lbl { color: #4a5568; font-size: 0.9rem; flex-shrink: 0; }
+{% extends "base.html" %}
+{% block title %}公民館申請書 作成フォーム{% endblock %}
+{% block accent %}#5a3e8e{% endblock %}
+{% block header_title %}公民館申請書　作成フォーム{% endblock %}
+{% block header_sub %}下関市立公民館{% endblock %}
 
-    /* 申請書種別タブ */
-    .type-tabs { display: flex; gap: 8px; margin-bottom: 24px; }
-    .type-tab {
-      flex: 1; padding: 12px 8px; border: 2px solid #e2e8f0; border-radius: 10px;
-      background: white; font-size: 0.82rem; font-weight: 600; color: #718096;
-      cursor: pointer; text-align: center; transition: all 0.15s; font-family: inherit;
-    }
-    .type-tab:hover { border-color: #5a3e8e; color: #5a3e8e; }
-    .type-tab.active { border-color: #5a3e8e; background: #5a3e8e; color: white; }
-
-    .note-box { background: #fef9e7; border: 1.5px solid #f6c90e; border-radius: 8px; padding: 12px 16px; font-size: 0.82rem; color: #744210; margin-top: -4px; margin-bottom: 16px; }
-
-    /* 使用日程テーブル */
-    .schedule-row { border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 14px; margin-bottom: 10px; position: relative; }
-    .schedule-row .row-num { font-size: 0.78rem; font-weight: 700; color: #5a3e8e; margin-bottom: 10px; }
-    .schedule-row .delete-btn { position: absolute; top: 10px; right: 10px; background: none; border: none; color: #e53e3e; cursor: pointer; font-size: 1.1rem; }
-    .schedule-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .schedule-grid .full { grid-column: 1 / -1; }
-
-    .back-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      margin-bottom: 16px; padding: 10px 18px;
-      background: white; color: #5a3e8e;
-      border: 1.5px solid #5a3e8e; border-radius: 8px;
-      font-size: 0.875rem; font-weight: 600; text-decoration: none;
-      transition: background 0.15s, color 0.15s;
-    }
-    .back-btn:hover { background: #5a3e8e; color: white; }
-    .submit-btn {
-      width: 100%; padding: 14px; background: #5a3e8e; color: white; border: none;
-      border-radius: 10px; font-size: 1rem; font-weight: 700; font-family: inherit;
-      letter-spacing: 0.05em; cursor: pointer; transition: background 0.2s; margin-top: 8px;
-    }
-    .submit-btn:hover { background: #4a3278; }
-    .note { font-size: 0.8rem; color: #718096; text-align: center; margin-top: 14px; }
-  </style>
-</head>
-<body>
-
-<header>
-  <h1>公民館申請書　作成フォーム</h1>
-  <p>下関市立公民館</p>
-</header>
-
-<div class="container">
-  <a href="/" class="back-btn">← 申請書の選択に戻る</a>
-
+{% block content %}
   <!-- 申請書種別選択 -->
   <div class="card">
     <h2>作成する申請書を選択</h2>
@@ -188,22 +100,28 @@
           <span style="font-size:0.9rem;color:#4a5568;">人</span>
         </div>
       </div>
+      <div class="field" id="field_houki">
+        <label class="check-row">
+          <input type="checkbox" name="houki_kakunin" value="1">
+          <span>本申請は、社会教育法第２３条（営利、特定の政党の事業や候補者の支持、特定の宗教や教団等の支持）に係る使用では<strong>ありません</strong>。（確認のうえチェックしてください）</span>
+        </label>
+      </div>
     </div>
 
-    <!-- 使用日程（申請書・減免申請書のみ） -->
+    <!-- 使用日程 -->
     <div class="card" id="card_datetime">
-      <h2>使用日程（最大5件）</h2>
+      <h2 id="datetime_title">使用日程（最大5件）</h2>
       <div id="schedule_rows"></div>
-      <button type="button" id="add_row_btn" onclick="addScheduleRow()" style="margin-top:10px;padding:8px 16px;background:#f0e9ff;border:1.5px solid #5a3e8e;border-radius:8px;color:#5a3e8e;font-weight:600;cursor:pointer;font-family:inherit;font-size:0.875rem;">＋ 日程を追加</button>
+      <button type="button" id="add_row_btn" class="add-row-btn" onclick="addScheduleRow()">＋ 日程を追加</button>
       <p style="font-size:0.75rem;color:#a0aec0;margin-top:8px;">最大5件まで追加できます</p>
     </div>
 
-    <button type="submit" class="submit-btn" id="submit_btn">申請書を作成してダウンロード</button>
-    <p class="note">ボタンを押すとWordファイルが自動的にダウンロードされます</p>
-    <a href="/" class="back-btn" style="margin-top:16px;justify-content:center;width:100%;">← 申請書の選択に戻る</a>
+    {% set submit_label = "施設使用許可申請書を作成してダウンロード" %}
+    {% include "_submit.html" %}
   </form>
-</div>
+{% endblock %}
 
+{% block scripts %}
 <script>
   let currentType = 'shiyo';
 
@@ -212,58 +130,22 @@
     document.querySelectorAll('.type-tab').forEach((t, i) => {
       t.classList.toggle('active', ['shiyo','genmen','chushi'][i] === type);
     });
-    const showShiyou = type !== 'chushi';
-    document.getElementById('card_shiyou').style.display = showShiyou ? '' : 'none';
-    document.getElementById('card_datetime').style.display = showShiyou ? '' : 'none';
-    document.getElementById('note_chushi').style.display = type === 'chushi' ? '' : 'none';
+    const isChushi = type === 'chushi';
+    document.getElementById('card_shiyou').style.display = isChushi ? 'none' : '';
+    document.getElementById('note_chushi').style.display = isChushi ? '' : 'none';
+    document.getElementById('field_houki').style.display = type === 'shiyo' ? '' : 'none';
+    document.getElementById('datetime_title').textContent =
+      isChushi ? '中止する使用日程（最大5件）' : '使用日程（最大5件）';
 
-    const actions = {
-      shiyo: '/generate_kouminkan_shiyo',
-      genmen: '/generate_kouminkan_genmen',
-      chushi: '/generate_kouminkan_chushi',
-    };
-    document.getElementById('mainForm').action = actions[type];
+    document.getElementById('mainForm').action = `/generate/kouminkan_${type}`;
 
     const labels = {
-      shiyo: '施設使用許可申請書を作成してダウンロード',
+      shiyo:  '施設使用許可申請書を作成してダウンロード',
       genmen: '使用料減免申請書を作成してダウンロード',
       chushi: '使用中止届を作成してダウンロード',
     };
-    document.getElementById('submit_btn').textContent = labels[type];
+    document.getElementById('submit_btn').textContent = labels[type] + '（Word）';
   }
-
-  function fillMonthDay() {
-    document.querySelectorAll('.month-sel').forEach(s => { for (let m=1;m<=12;m++) s.appendChild(new Option(m,m)); });
-    document.querySelectorAll('.day-sel').forEach(s => { for (let d=1;d<=31;d++) s.appendChild(new Option(d,d)); });
-  }
-
-  function combineDate(eraId, yearId, monthId, dayId) {
-    const era=document.getElementById(eraId).value, year=document.getElementById(yearId).value,
-          month=document.getElementById(monthId).value, day=document.getElementById(dayId).value;
-    return (year && month && day) ? `${era}${year}年${month}月${day}日` : '';
-  }
-
-  async function searchZip(zipInputId, addressInputId) {
-    const zipEl=document.getElementById(zipInputId), msgEl=document.getElementById(zipInputId+'_msg'), addrEl=document.getElementById(addressInputId);
-    const zip=zipEl.value.replace(/-/g,'').replace(/[０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0));
-    if(zip.length!==7||!/^\d{7}$/.test(zip)){msgEl.textContent='7桁の数字で入力してください';msgEl.className='zip-msg err';return;}
-    msgEl.textContent='検索中...';msgEl.className='zip-msg loading';
-    try{
-      const res=await fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${zip}`);
-      const data=await res.json();
-      if(data.results&&data.results.length>0){const r=data.results[0];addrEl.value=r.address1+r.address2+r.address3;msgEl.textContent='住所が見つかりました。番地を追記してください。';msgEl.className='zip-msg ok';}
-      else{msgEl.textContent='該当する住所が見つかりませんでした。';msgEl.className='zip-msg err';}
-    }catch{msgEl.textContent='検索に失敗しました。手動で入力してください。';msgEl.className='zip-msg err';}
-  }
-
-  document.getElementById('zip1').addEventListener('input', e=>{if(e.target.value.replace(/-/g,'').length===7)searchZip('zip1','jusho_input');});
-  document.getElementById('zip1').addEventListener('keydown', e=>{if(e.key==='Enter'){e.preventDefault();searchZip('zip1','jusho_input');}});
-
-  document.getElementById('mainForm').addEventListener('submit', function(e) {
-    const shinsei = combineDate('shinsei_era','shinsei_year','shinsei_month','shinsei_day');
-    if(!shinsei){e.preventDefault();alert('申請日を入力してください。');return;}
-    document.getElementById('h_shinsei_date').value = shinsei;
-  });
 
   // ── 使用日程の追加 ──────────────────────────────────
   let scheduleCount = 0;
@@ -283,9 +165,7 @@
     if (scheduleCount >= 5) { alert('日程は最大5件まで入力できます。'); return; }
     scheduleCount++;
     const n = scheduleCount;
-    const timeOpts = TIME_OPTIONS.map(o =>
-      `<option value="${o.value}">${o.label}</option>`
-    ).join('');
+    const timeOpts = TIME_OPTIONS.map(o => `<option value="${o.value}">${o.label}</option>`).join('');
 
     const row = document.createElement('div');
     row.className = 'schedule-row';
@@ -295,21 +175,19 @@
       <button type="button" class="delete-btn" onclick="deleteScheduleRow(${n})">✕</button>
       <div class="schedule-grid">
         <div class="field">
-          <label>使用年月日<span style="color:#e53e3e;font-size:0.75rem;margin-left:4px">必須</span></label>
+          <label>使用年月日<span class="required">必須</span></label>
           <input type="text" name="date_${n}" placeholder="例：令和8年6月15日" required>
         </div>
         <div class="field">
-          <label>使用室名<span style="color:#e53e3e;font-size:0.75rem;margin-left:4px">必須</span></label>
+          <label>使用室名<span class="required">必須</span></label>
           <input type="text" name="room_${n}" placeholder="例：会議室、和室" required>
         </div>
         <div class="field">
-          <label>時間帯<span style="color:#e53e3e;font-size:0.75rem;margin-left:4px">必須</span></label>
-          <select name="time_${n}" required>
-            ${timeOpts}
-          </select>
+          <label>時間帯<span class="required">必須</span></label>
+          <select name="time_${n}" required>${timeOpts}</select>
         </div>
         <div class="field">
-          <label>摘要<span style="color:#a0aec0;font-size:0.75rem;margin-left:4px">任意</span></label>
+          <label>摘要<span class="hint">任意</span></label>
           <input type="text" name="biko_${n}" placeholder="例：定例会議">
         </div>
       </div>`;
@@ -329,18 +207,22 @@
     document.getElementById('add_row_btn').style.opacity = '1';
   }
 
-  // 初期状態で1件追加
+  bindZip({ zip1: 'jusho_input' });
+
+  document.getElementById('mainForm').addEventListener('submit', function(e) {
+    const shinsei = combineDate('shinsei_era','shinsei_year','shinsei_month','shinsei_day');
+    if (!shinsei) { e.preventDefault(); alert('申請日を入力してください。'); return; }
+    if (currentType === 'shiyo' && !document.querySelector('input[name="houki_kakunin"]').checked) {
+      e.preventDefault();
+      alert('社会教育法第２３条に係る使用でないことを確認のうえ、チェックを入れてください。');
+      return;
+    }
+    document.getElementById('h_shinsei_date').value = shinsei;
+  });
+
   addScheduleRow();
-
   fillMonthDay();
-  const today = new Date();
-  document.getElementById('shinsei_year').value  = today.getFullYear() - 2018;
-  document.getElementById('shinsei_month').value = today.getMonth() + 1;
-  document.getElementById('shinsei_day').value   = today.getDate();
-
-  // 初期状態をセット
+  setToday('shinsei_year','shinsei_month','shinsei_day');
   setType('shiyo');
 </script>
-
-</body>
-</html>
+{% endblock %}

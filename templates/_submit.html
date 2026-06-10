@@ -1,0 +1,7 @@
+{# ダウンロードボタン共通部品。submit_label を {% set %} してから include する #}
+<button type="submit" name="fmt" value="docx" class="submit-btn" id="submit_btn">{{ submit_label }}（Word）</button>
+{% if pdf_enabled %}
+<button type="submit" name="fmt" value="pdf" class="submit-btn submit-btn-outline" id="submit_btn_pdf">PDFでダウンロード</button>
+{% endif %}
+<p class="note">ボタンを押すとファイルが自動的にダウンロードされます</p>
+<a href="/" class="back-btn back-full">← 申請書の選択に戻る</a>

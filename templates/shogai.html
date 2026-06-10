@@ -1,72 +1,15 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>障害福祉サービス事業等開始届 作成フォーム</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: "Hiragino Sans", "Meiryo", sans-serif; background: #f0f4f8; color: #2d3748; min-height: 100vh; }
-    header { background: #744210; color: white; padding: 20px 24px; }
-    header h1 { font-size: 1.1rem; font-weight: 700; letter-spacing: 0.03em; }
-    header p { margin-top: 4px; font-size: 0.85rem; opacity: 0.85; }
-    .container { max-width: 680px; margin: 32px auto; padding: 0 16px 48px; }
-    .card { background: white; border-radius: 12px; padding: 28px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-    .card h2 { font-size: 0.95rem; font-weight: 700; color: #744210; border-left: 4px solid #744210; padding-left: 10px; margin-bottom: 20px; }
-    .field { margin-bottom: 18px; }
-    .field:last-child { margin-bottom: 0; }
-    label { display: block; font-size: 0.875rem; font-weight: 600; color: #4a5568; margin-bottom: 6px; }
-    label .required { color: #e53e3e; margin-left: 4px; font-size: 0.75rem; }
-    label .hint { color: #a0aec0; font-weight: 400; font-size: 0.78rem; margin-left: 6px; }
-    input[type="text"], input[type="number"], select {
-      width: 100%; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 8px;
-      font-size: 0.95rem; font-family: inherit; color: #2d3748; background: #fff;
-      transition: border-color 0.2s; -webkit-appearance: none;
-    }
-    input[type="text"]:focus, input[type="number"]:focus, select:focus {
-      outline: none; border-color: #744210; box-shadow: 0 0 0 3px rgba(116,66,16,0.1);
-    }
-    select {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23718096' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px;
-    }
-    .row { display: flex; gap: 12px; }
-    .row .field { flex: 1; }
-    .zip-row { display: flex; gap: 8px; align-items: flex-end; margin-bottom: 10px; }
-    .zip-row input { flex: 1; max-width: 160px; }
-    .zip-btn { padding: 10px 16px; background: #e2e8f0; border: 1.5px solid #cbd5e0; border-radius: 8px; font-size: 0.875rem; font-family: inherit; color: #4a5568; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
-    .zip-btn:hover { background: #cbd5e0; }
-    .zip-msg { font-size: 0.78rem; margin-top: 4px; min-height: 18px; }
-    .zip-msg.ok { color: #38a169; } .zip-msg.err { color: #e53e3e; } .zip-msg.loading { color: #718096; }
-    .date-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-    .date-row .era-label { font-size: 0.9rem; color: #4a5568; font-weight: 600; flex-shrink: 0; }
-    .date-row .year-num { width: 68px; flex-shrink: 0; }
-    .date-row .month-sel { width: 68px; flex-shrink: 0; }
-    .date-row .day-sel { width: 68px; flex-shrink: 0; }
-    .date-lbl { color: #4a5568; font-size: 0.9rem; flex-shrink: 0; }
-    .note-box { background: #fffaf0; border: 1.5px solid #f6ad55; border-radius: 8px; padding: 12px 16px; font-size: 0.82rem; color: #7b341e; margin-bottom: 16px; }
-    .back-btn { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 16px; padding: 10px 18px; background: white; color: #744210; border: 1.5px solid #744210; border-radius: 8px; font-size: 0.875rem; font-weight: 600; text-decoration: none; transition: background 0.15s, color 0.15s; }
-    .back-btn:hover { background: #744210; color: white; }
-    .submit-btn { width: 100%; padding: 14px; background: #744210; color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700; font-family: inherit; letter-spacing: 0.05em; cursor: pointer; transition: background 0.2s; margin-top: 8px; }
-    .submit-btn:hover { background: #5c3208; }
-    .note { font-size: 0.8rem; color: #718096; text-align: center; margin-top: 14px; }
-  </style>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}障害福祉サービス事業等開始届 作成フォーム{% endblock %}
+{% block accent %}#744210{% endblock %}
+{% block header_title %}障害福祉サービス事業等開始届　作成フォーム{% endblock %}
+{% block header_sub %}下関市障害者支援課（事業者向け）{% endblock %}
 
-<header>
-  <h1>障害福祉サービス事業等開始届　作成フォーム</h1>
-  <p>下関市障害者支援課（事業者向け）</p>
-</header>
-
-<div class="container">
-  <a href="/" class="back-btn">← 申請書の選択に戻る</a>
-
+{% block content %}
   <div class="note-box">
-    📋 <strong>ご注意：</strong>事業の種類のチェックボックス、事業内容・職員・施設等の各項目（１〜９番）はダウンロード後にWordファイルへ直接ご記入ください。
+    📋 <strong>ご注意：</strong>条例・定款、職員の定数、収支予算書、事業計画書などの「別紙・別添」書類は別途ご準備ください。
   </div>
 
-  <form id="mainForm" action="/generate_shogai_jigyo" method="POST" novalidate>
+  <form id="mainForm" action="/generate/shogai" method="POST" novalidate>
 
     <!-- 届出日 -->
     <div class="card">
@@ -127,6 +70,10 @@
         <label>事業の内容<span class="required">必須</span><span class="hint">具体的なサービス内容</span></label>
         <textarea name="jigyo_naiyou" placeholder="例：居宅介護（身体介護・家事援助・移動介護）&#10;対象：身体障害者・知的障害者・精神障害者" required></textarea>
       </div>
+      <div class="field">
+        <label>事業を行おうとする区域<span class="hint">例：下関市全域</span></label>
+        <input type="text" name="jigyo_kuiki" placeholder="下関市全域">
+      </div>
     </div>
 
     <!-- 経営者情報 -->
@@ -180,46 +127,26 @@
       </div>
     </div>
 
-    <button type="submit" class="submit-btn">障害福祉サービス事業等開始届を作成してダウンロード</button>
-    <p class="note">ボタンを押すとWordファイルが自動的にダウンロードされます</p>
-    <a href="/" class="back-btn" style="margin-top:16px;justify-content:center;width:100%;">← 申請書の選択に戻る</a>
+    {% set submit_label = "障害福祉サービス事業等開始届を作成してダウンロード" %}
+    {% include "_submit.html" %}
   </form>
-</div>
+{% endblock %}
 
+{% block scripts %}
 <script>
-  function fillMonthDay() {
-    document.querySelectorAll('.month-sel').forEach(s=>{for(let m=1;m<=12;m++)s.appendChild(new Option(m,m));});
-    document.querySelectorAll('.day-sel').forEach(s=>{for(let d=1;d<=31;d++)s.appendChild(new Option(d,d));});
-  }
-
-  async function searchZip(zipId, addrId) {
-    const zipEl=document.getElementById(zipId), msgEl=document.getElementById(zipId+'_msg'), addrEl=document.getElementById(addrId);
-    const zip=zipEl.value.replace(/-/g,'').replace(/[０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0));
-    if(zip.length!==7||!/^\d{7}$/.test(zip)){msgEl.textContent='7桁の数字で入力してください';msgEl.className='zip-msg err';return;}
-    msgEl.textContent='検索中...';msgEl.className='zip-msg loading';
-    try{const res=await fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${zip}`);const data=await res.json();
-      if(data.results&&data.results.length>0){const r=data.results[0];addrEl.value=r.address1+r.address2+r.address3;msgEl.textContent='住所が見つかりました。番地を追記してください。';msgEl.className='zip-msg ok';}
-      else{msgEl.textContent='該当する住所が見つかりませんでした。';msgEl.className='zip-msg err';}}
-    catch{msgEl.textContent='検索に失敗しました。手動で入力してください。';msgEl.className='zip-msg err';}
-  }
-
-  document.getElementById('zip1').addEventListener('input', e=>{if(e.target.value.replace(/-/g,'').length===7)searchZip('zip1','shozaichi_input');});
-  document.getElementById('zip1').addEventListener('keydown', e=>{if(e.key==='Enter'){e.preventDefault();searchZip('zip1','shozaichi_input');}});
+  bindZip({ zip1: 'shozaichi_input' });
 
   document.getElementById('mainForm').addEventListener('submit', function(e) {
-    const nenFields = ['todoke_nen', 'kaishi_nen'];
-    for(const f of nenFields){
-      if(!document.getElementById(f).value){e.preventDefault();alert('年を入力してください。');return;}
+    for (const f of ['todoke_nen', 'kaishi_nen']) {
+      if (!document.getElementById(f).value) {
+        e.preventDefault();
+        alert('年を入力してください。');
+        return;
+      }
     }
   });
 
   fillMonthDay();
-  const today = new Date();
-  const reiwa = today.getFullYear()-2018;
-  document.getElementById('todoke_nen').value  = reiwa;
-  document.getElementById('todoke_tsuki').value = today.getMonth()+1;
-  document.getElementById('todoke_hi').value   = today.getDate();
+  setToday('todoke_nen','todoke_tsuki','todoke_hi');
 </script>
-
-</body>
-</html>
+{% endblock %}

@@ -1,73 +1,11 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>排水設備所有者変更届 作成フォーム</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: "Hiragino Sans", "Meiryo", sans-serif; background: #f0f4f8; color: #2d3748; min-height: 100vh; }
-    header { background: #2b6cb0; color: white; padding: 20px 24px; }
-    header h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: 0.03em; }
-    header p { margin-top: 4px; font-size: 0.85rem; opacity: 0.85; }
-    .container { max-width: 680px; margin: 32px auto; padding: 0 16px 48px; }
-    .card { background: white; border-radius: 12px; padding: 28px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-    .card h2 { font-size: 0.95rem; font-weight: 700; color: #2b6cb0; border-left: 4px solid #2b6cb0; padding-left: 10px; margin-bottom: 20px; }
-    .field { margin-bottom: 18px; }
-    .field:last-child { margin-bottom: 0; }
-    label { display: block; font-size: 0.875rem; font-weight: 600; color: #4a5568; margin-bottom: 6px; }
-    label .required { color: #e53e3e; margin-left: 4px; font-size: 0.75rem; }
-    label .hint { color: #a0aec0; font-weight: 400; font-size: 0.78rem; margin-left: 6px; }
-    input[type="text"], input[type="number"], select, textarea {
-      width: 100%; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 8px;
-      font-size: 0.95rem; font-family: inherit; color: #2d3748; background: #fff;
-      transition: border-color 0.2s; -webkit-appearance: none;
-    }
-    input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:focus {
-      outline: none; border-color: #2b6cb0; box-shadow: 0 0 0 3px rgba(43,108,176,0.1);
-    }
-    select {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23718096' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px;
-    }
-    textarea { resize: vertical; min-height: 70px; }
-    .row { display: flex; gap: 12px; }
-    .row .field { flex: 1; }
-    .zip-row { display: flex; gap: 8px; align-items: flex-end; margin-bottom: 10px; }
-    .zip-row input { flex: 1; max-width: 160px; }
-    .zip-btn { padding: 10px 16px; background: #e2e8f0; border: 1.5px solid #cbd5e0; border-radius: 8px; font-size: 0.875rem; font-family: inherit; color: #4a5568; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
-    .zip-btn:hover { background: #cbd5e0; }
-    .zip-msg { font-size: 0.78rem; margin-top: 4px; min-height: 18px; }
-    .zip-msg.ok { color: #38a169; } .zip-msg.err { color: #e53e3e; } .zip-msg.loading { color: #718096; }
-    .date-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-    .date-row .era-sel { width: 90px; flex-shrink: 0; }
-    .date-row .year-num { width: 68px; flex-shrink: 0; }
-    .date-row .month-sel { width: 68px; flex-shrink: 0; }
-    .date-row .day-sel { width: 68px; flex-shrink: 0; }
-    .date-lbl { color: #4a5568; font-size: 0.9rem; flex-shrink: 0; }
-    .section-divider { font-size: 0.8rem; font-weight: 700; color: #2b6cb0; background: #ebf4ff; border-radius: 6px; padding: 6px 12px; margin-bottom: 14px; }
-    .back-btn {
-      display: inline-flex; align-items: center; gap: 6px; margin-bottom: 16px; padding: 10px 18px;
-      background: white; color: #2b6cb0; border: 1.5px solid #2b6cb0; border-radius: 8px;
-      font-size: 0.875rem; font-weight: 600; text-decoration: none; transition: background 0.15s, color 0.15s;
-    }
-    .back-btn:hover { background: #2b6cb0; color: white; }
-    .submit-btn { width: 100%; padding: 14px; background: #2b6cb0; color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700; font-family: inherit; letter-spacing: 0.05em; cursor: pointer; transition: background 0.2s; margin-top: 8px; }
-    .submit-btn:hover { background: #2560a0; }
-    .note { font-size: 0.8rem; color: #718096; text-align: center; margin-top: 14px; }
-  </style>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}排水設備所有者変更届 作成フォーム{% endblock %}
+{% block accent %}#2b6cb0{% endblock %}
+{% block header_title %}排水設備所有者変更届　作成フォーム{% endblock %}
+{% block header_sub %}下関市上下水道局{% endblock %}
 
-<header>
-  <h1>排水設備所有者変更届　作成フォーム</h1>
-  <p>下関市上下水道局</p>
-</header>
-
-<div class="container">
-  <a href="/" class="back-btn">← 申請書の選択に戻る</a>
-
-  <form id="mainForm" action="/generate_suido_syoyusha" method="POST" novalidate>
+{% block content %}
+  <form id="mainForm" action="/generate/suido" method="POST" novalidate>
     <input type="hidden" name="todoke_date" id="h_todoke_date">
     <input type="hidden" name="jyoto_date"  id="h_jyoto_date">
 
@@ -171,61 +109,31 @@
       </div>
     </div>
 
-    <button type="submit" class="submit-btn">排水設備所有者変更届を作成してダウンロード</button>
-    <p class="note">ボタンを押すとWordファイルが自動的にダウンロードされます</p>
-    <a href="/" class="back-btn" style="margin-top:16px;justify-content:center;width:100%;">← 申請書の選択に戻る</a>
+    {% set submit_label = "排水設備所有者変更届を作成してダウンロード" %}
+    {% include "_submit.html" %}
   </form>
-</div>
+{% endblock %}
 
+{% block scripts %}
 <script>
-  function fillMonthDay() {
-    document.querySelectorAll('.month-sel').forEach(s => { for(let m=1;m<=12;m++) s.appendChild(new Option(m,m)); });
-    document.querySelectorAll('.day-sel').forEach(s => { for(let d=1;d<=31;d++) s.appendChild(new Option(d,d)); });
-  }
-
-  function combineDate(eraId, yearId, monthId, dayId) {
-    const era=document.getElementById(eraId).value, year=document.getElementById(yearId).value,
-          month=document.getElementById(monthId).value, day=document.getElementById(dayId).value;
-    return (year&&month&&day) ? `${era}${year}年${month}月${day}日` : '';
-  }
-
-  async function searchZip(zipInputId, addressInputId) {
-    const zipEl=document.getElementById(zipInputId), msgEl=document.getElementById(zipInputId+'_msg'), addrEl=document.getElementById(addressInputId);
-    const zip=zipEl.value.replace(/-/g,'').replace(/[０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0));
-    if(zip.length!==7||!/^\d{7}$/.test(zip)){msgEl.textContent='7桁の数字で入力してください';msgEl.className='zip-msg err';return;}
-    msgEl.textContent='検索中...';msgEl.className='zip-msg loading';
-    try{
-      const res=await fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${zip}`);
-      const data=await res.json();
-      if(data.results&&data.results.length>0){const r=data.results[0];addrEl.value=r.address1+r.address2+r.address3;msgEl.textContent='住所が見つかりました。番地を追記してください。';msgEl.className='zip-msg ok';}
-      else{msgEl.textContent='該当する住所が見つかりませんでした。';msgEl.className='zip-msg err';}
-    }catch{msgEl.textContent='検索に失敗しました。手動で入力してください。';msgEl.className='zip-msg err';}
-  }
-
-  ['zip1','zip2','zip3'].forEach(id => {
-    const targets = {zip1:'shutsu_jusho_input', zip2:'mae_jusho_input', zip3:'ato_jusho_input'};
-    document.getElementById(id).addEventListener('input', e=>{if(e.target.value.replace(/-/g,'').length===7)searchZip(id,targets[id]);});
-    document.getElementById(id).addEventListener('keydown', e=>{if(e.key==='Enter'){e.preventDefault();searchZip(id,targets[id]);}});
-  });
+  bindZip({ zip1: 'shutsu_jusho_input', zip2: 'mae_jusho_input', zip3: 'ato_jusho_input' });
 
   document.getElementById('mainForm').addEventListener('submit', function(e) {
     const todoke = combineDate('todoke_era','todoke_year','todoke_month','todoke_day');
     const jyoto  = combineDate('jyoto_era','jyoto_year','jyoto_month','jyoto_day');
     const errors = [];
-    if(!todoke) errors.push('届出日');
-    if(!jyoto)  errors.push('譲渡年月日');
-    if(errors.length>0){e.preventDefault();alert('以下の項目を入力してください：\n・'+errors.join('\n・'));return;}
+    if (!todoke) errors.push('届出日');
+    if (!jyoto)  errors.push('譲渡年月日');
+    if (errors.length > 0) {
+      e.preventDefault();
+      alert('以下の項目を入力してください：\n・' + errors.join('\n・'));
+      return;
+    }
     document.getElementById('h_todoke_date').value = todoke;
     document.getElementById('h_jyoto_date').value  = jyoto;
   });
 
   fillMonthDay();
-  const today = new Date();
-  const reiwa = today.getFullYear()-2018;
-  document.getElementById('todoke_year').value  = reiwa;
-  document.getElementById('todoke_month').value = today.getMonth()+1;
-  document.getElementById('todoke_day').value   = today.getDate();
+  setToday('todoke_year','todoke_month','todoke_day');
 </script>
-
-</body>
-</html>
+{% endblock %}

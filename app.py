@@ -1,282 +1,283 @@
+import datetime
 import io
 import os
-from docxtpl import DocxTemplate
-from flask import Flask, render_template, request, send_file
+import re
+import shutil
+import subprocess
+import tempfile
+
+from docxtpl import DocxTemplate, Listing
+from flask import Flask, abort, render_template, request, send_file
 
 app = Flask(__name__)
+BASE_DIR = os.path.dirname(__file__)
 
-TEIJUU_TEMPLATE   = os.path.join(os.path.dirname(__file__), "teijuu_template.docx")
-SHUSSAN_TEMPLATE  = os.path.join(os.path.dirname(__file__), "shussan_template.docx")
-SUIDO_SYOYUSHA    = os.path.join(os.path.dirname(__file__), "suido_syoyusha_template.docx")
-NOSHIN_MOUSHIDE   = os.path.join(os.path.dirname(__file__), "noshin_moushide_template.docx")
-SHOGAI_JIGYO      = os.path.join(os.path.dirname(__file__), "shogai_jigyo_template.docx")
-KOUMINKAN_SHIYO   = os.path.join(os.path.dirname(__file__), "kouminkan_shiyo_template.docx")
-KOUMINKAN_GENMEN  = os.path.join(os.path.dirname(__file__), "kouminkan_genmen_template.docx")
-KOUMINKAN_CHUSHI  = os.path.join(os.path.dirname(__file__), "kouminkan_chushi_template.docx")
+DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 
+# ──────────────────────────────────────────────────────────────
+# 入力フォームページ
+# ──────────────────────────────────────────────────────────────
+PAGES = {
+    "/":          "top.html",
+    "/teijuu":    "teijuu.html",
+    "/shussan":   "shussan.html",
+    "/shogai":    "shogai.html",
+    "/noshin":    "noshin.html",
+    "/suido":     "suido.html",
+    "/kouminkan": "kouminkan.html",
+}
 
-@app.route("/", methods=["GET"])
-def top():
-    return render_template("top.html")
-
-
-@app.route("/teijuu", methods=["GET"])
-def teijuu():
-    return render_template("index.html")
-
-
-@app.route("/shussan", methods=["GET"])
-def shussan():
-    return render_template("shussan.html")
+for url, page in PAGES.items():
+    app.add_url_rule(url, endpoint=f"page_{page}",
+                     view_func=(lambda page=page: render_template(page)))
 
 
-@app.route("/generate", methods=["POST"])
-def generate():
-    context = {
-        "shinsei_date":     request.form.get("shinsei_date", ""),
-        "shimei":           request.form.get("shimei", ""),
-        "jusho":            request.form.get("jusho", ""),
-        "denwa":            request.form.get("denwa", ""),
-        "seibetsu":         request.form.get("seibetsu", ""),
-        "seinengappi":      request.form.get("seinengappi", ""),
-        "nenrei":           request.form.get("nenrei", ""),
-        "kinmusaki":        request.form.get("kinmusaki", ""),
-        "shokushu":         request.form.get("shokushu", ""),
-        "tennyu_date":      request.form.get("tennyu_date", ""),
-        "teijuu_date":      request.form.get("teijuu_date", ""),
-        "tennyu_mae_jusho": request.form.get("tennyu_mae_jusho", ""),
-    }
-    doc = DocxTemplate(TEIJUU_TEMPLATE)
-    doc.render(context)
+# ──────────────────────────────────────────────────────────────
+# 和暦ユーティリティ
+# ──────────────────────────────────────────────────────────────
+ERA_BASE = {"令和": 2018, "平成": 1988, "昭和": 1925, "大正": 1911}
+YOUBI = "月火水木金土日"
+
+
+def wareki_youbi(wareki):
+    """「令和8年6月15日」のような和暦文字列から曜日を返す。解釈できなければ空文字。"""
+    m = re.match(r"(令和|平成|昭和|大正)(\d+)年(\d+)月(\d+)日", wareki.strip())
+    if not m:
+        return ""
+    era, y, mo, d = m.group(1), int(m.group(2)), int(m.group(3)), int(m.group(4))
+    try:
+        date = datetime.date(ERA_BASE[era] + y, mo, d)
+    except ValueError:
+        return ""
+    return YOUBI[date.weekday()]
+
+
+def to_number(value):
+    try:
+        return float(value.replace(",", "").strip())
+    except (ValueError, AttributeError):
+        return None
+
+
+def fmt_number(num):
+    return str(int(num)) if num == int(num) else str(num)
+
+
+# ──────────────────────────────────────────────────────────────
+# フォームごとの追加コンテキスト（チェックボックス・計算項目など）
+# ──────────────────────────────────────────────────────────────
+CK_KEYS = ("gozen", "encho1", "gogo", "encho2", "yakan")
+TIME_CHECKS = {
+    "午前":            {"gozen"},
+    "午前・延長":      {"gozen", "encho1"},
+    "午後":            {"gogo"},
+    "午後・延長":      {"gogo", "encho2"},
+    "夜間":            {"yakan"},
+    "午前・午後":      {"gozen", "encho1", "gogo"},
+    "午前・午後・夜間": {"gozen", "encho1", "gogo", "encho2", "yakan"},
+}
+
+
+def kouminkan_extra(form, ctx):
+    # 入力済みの日程行だけを集めて1行目から詰める
+    rows = []
+    for n in range(1, 6):
+        row = {k: form.get(f"{k}_{n}", "").strip() for k in ("date", "room", "time", "biko")}
+        if any(row.values()):
+            rows.append(row)
+    for n in range(1, 6):
+        row = rows[n - 1] if n <= len(rows) else {"date": "", "room": "", "time": "", "biko": ""}
+        ctx[f"date_{n}"] = row["date"]
+        ctx[f"room_{n}"] = row["room"]
+        ctx[f"biko_{n}"] = row["biko"]
+        ctx[f"youbi_{n}"] = wareki_youbi(row["date"])
+        checked = TIME_CHECKS.get(row["time"], set())
+        for key in CK_KEYS:
+            ctx[f"ck_{n}_{key}"] = "☑" if key in checked else "□"
+    ctx["houki_check"] = "☑" if form.get("houki_kakunin") else "□"
+
+
+def noshin_extra(form, ctx):
+    nai = to_number(form.get("kuiki_nai_menseki", ""))
+    gai = to_number(form.get("kuiki_gai_menseki", ""))
+    ctx["kuiki_kei"] = fmt_number((nai or 0) + (gai or 0)) if (nai is not None or gai is not None) else ""
+    for field in ("ta", "hata"):
+        genzai = to_number(form.get(f"{field}_genzai", ""))
+        ato = to_number(form.get(f"{field}_ato", ""))
+        if genzai is not None and ato is not None:
+            diff = ato - genzai
+            ctx[f"{field}_zougen"] = f"△{fmt_number(abs(diff))}" if diff < 0 else fmt_number(diff)
+        else:
+            ctx[f"{field}_zougen"] = ""
+
+
+def shogai_extra(form, ctx):
+    teiin = form.get("nyusho_teiin", "").strip()
+    if teiin and not teiin.endswith("人"):
+        ctx["nyusho_teiin"] = teiin + "人"
+
+
+# ──────────────────────────────────────────────────────────────
+# 申請書定義：新しい様式はここに1件追加するだけ
+#   template   : docxテンプレートのファイル名
+#   filename   : ダウンロードファイル名の接頭辞
+#   name_fields: ファイル名に使う申請者名（先に見つかった非空値を使用）
+#   extra      : 追加コンテキストを組み立てる関数（任意）
+# ──────────────────────────────────────────────────────────────
+FORMS = {
+    "teijuu": {
+        "template": "teijuu_template.docx",
+        "filename": "定住奨励金支給申請書",
+        "name_fields": ["shimei"],
+    },
+    "shussan": {
+        "template": "shussan_template.docx",
+        "filename": "出産祝い金支給申請書",
+        "name_fields": ["shimei"],
+    },
+    "shogai": {
+        "template": "shogai_jigyo_template.docx",
+        "filename": "障害福祉サービス事業等開始届",
+        "name_fields": ["meisho"],
+        "extra": shogai_extra,
+    },
+    "noshin": {
+        "template": "noshin_moushide_template.docx",
+        "filename": "農業振興地域整備計画変更申出書",
+        "name_fields": ["shinshutsu_shimei"],
+        "extra": noshin_extra,
+    },
+    "suido": {
+        "template": "suido_syoyusha_template.docx",
+        "filename": "排水設備所有者変更届",
+        "name_fields": ["ato_shimei"],
+    },
+    "kouminkan_shiyo": {
+        "template": "kouminkan_shiyo_template.docx",
+        "filename": "公民館使用許可申請書",
+        "name_fields": ["dantai_name", "daihyo_name"],
+        "extra": kouminkan_extra,
+    },
+    "kouminkan_genmen": {
+        "template": "kouminkan_genmen_template.docx",
+        "filename": "公民館使用料減免申請書",
+        "name_fields": ["dantai_name", "daihyo_name"],
+        "extra": kouminkan_extra,
+    },
+    "kouminkan_chushi": {
+        "template": "kouminkan_chushi_template.docx",
+        "filename": "公民館使用中止届",
+        "name_fields": ["dantai_name", "daihyo_name"],
+        "extra": kouminkan_extra,
+    },
+}
+
+
+# ──────────────────────────────────────────────────────────────
+# PDF変換（LibreOffice）
+# ──────────────────────────────────────────────────────────────
+def find_soffice():
+    for cand in ("soffice", "libreoffice"):
+        path = shutil.which(cand)
+        if path:
+            return path
+    for path in (r"C:\Program Files\LibreOffice\program\soffice.exe",
+                 r"C:\Program Files (x86)\LibreOffice\program\soffice.exe"):
+        if os.path.exists(path):
+            return path
+    return None
+
+
+def docx_to_pdf(docx_bytes):
+    soffice = find_soffice()
+    if soffice is None:
+        raise RuntimeError("LibreOffice (soffice) が見つかりません")
+    with tempfile.TemporaryDirectory() as tmp:
+        src = os.path.join(tmp, "output.docx")
+        with open(src, "wb") as f:
+            f.write(docx_bytes)
+        profile = "file:///" + os.path.join(tmp, "lo").replace(os.sep, "/")
+        subprocess.run(
+            [soffice, "--headless", "--norestore", f"-env:UserInstallation={profile}",
+             "--convert-to", "pdf", "--outdir", tmp, src],
+            check=True, timeout=120,
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        )
+        with open(os.path.join(tmp, "output.pdf"), "rb") as f:
+            return f.read()
+
+
+@app.context_processor
+def inject_pdf_enabled():
+    return {"pdf_enabled": find_soffice() is not None}
+
+
+# ──────────────────────────────────────────────────────────────
+# 申請書生成
+# ──────────────────────────────────────────────────────────────
+def build_context(cfg, form):
+    ctx = {k: v for k, v in form.items() if k != "fmt"}
+    if "extra" in cfg:
+        cfg["extra"](form, ctx)
+    # 複数行入力はWord内でも改行されるように Listing でラップ
+    def wrap(value):
+        if isinstance(value, str):
+            value = value.replace("\r\n", "\n").replace("\r", "\n")
+            if "\n" in value:
+                return Listing(value)
+        return value
+
+    return {k: wrap(v) for k, v in ctx.items()}
+
+
+def safe_name(cfg, form):
+    for field in cfg["name_fields"]:
+        value = form.get(field, "").strip()
+        if value:
+            return re.sub(r'[\\/:*?"<>|\s　]+', "_", value)
+    return "申請者"
+
+
+@app.route("/generate/<form_id>", methods=["POST"])
+def generate(form_id):
+    cfg = FORMS.get(form_id)
+    if cfg is None:
+        abort(404)
+
+    doc = DocxTemplate(os.path.join(BASE_DIR, cfg["template"]))
+    doc.render(build_context(cfg, request.form))
     buffer = io.BytesIO()
     doc.save(buffer)
+
+    filename = f"{cfg['filename']}_{safe_name(cfg, request.form)}"
+    if request.form.get("fmt") == "pdf":
+        try:
+            pdf_bytes = docx_to_pdf(buffer.getvalue())
+        except (RuntimeError, subprocess.SubprocessError):
+            return ("PDF変換は現在利用できません。Word形式をご利用ください。", 503)
+        return send_file(io.BytesIO(pdf_bytes), as_attachment=True,
+                         download_name=f"{filename}.pdf", mimetype="application/pdf")
+
     buffer.seek(0)
-    safe_name = context["shimei"].replace(" ", "_").replace("　", "_")
     return send_file(buffer, as_attachment=True,
-                     download_name=f"定住奨励金支給申請書_{safe_name}.docx",
-                     mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+                     download_name=f"{filename}.docx", mimetype=DOCX_MIME)
 
 
-@app.route("/generate_shussan", methods=["POST"])
-def generate_shussan():
-    context = {
-        "shinsei_date":    request.form.get("shinsei_date", ""),
-        "shimei":          request.form.get("shimei", ""),
-        "jusho":           request.form.get("jusho", ""),
-        "denwa":           request.form.get("denwa", ""),
-        "shussei_date":    request.form.get("shussei_date", ""),
-        "dai_ko":          request.form.get("dai_ko", ""),
-        "shussei_furigana": request.form.get("shussei_furigana", ""),
-        "shussei_shimei":  request.form.get("shussei_shimei", ""),
-        "yoikusha_shimei": request.form.get("yoikusha_shimei", ""),
-        "genjusho":        request.form.get("genjusho", ""),
-        "kinmusaki":       request.form.get("kinmusaki", ""),
-    }
-    doc = DocxTemplate(SHUSSAN_TEMPLATE)
-    doc.render(context)
-    buffer = io.BytesIO()
-    doc.save(buffer)
-    buffer.seek(0)
-    safe_name = context["shimei"].replace(" ", "_").replace("　", "_")
-    return send_file(buffer, as_attachment=True,
-                     download_name=f"出産祝い金支給申請書_{safe_name}.docx",
-                     mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+# 旧URL（ブックマーク・キャッシュ済みページ用）
+LEGACY_ENDPOINTS = {
+    "/generate":                   "teijuu",
+    "/generate_shussan":           "shussan",
+    "/generate_shogai_jigyo":      "shogai",
+    "/generate_noshin_moushide":   "noshin",
+    "/generate_suido_syoyusha":    "suido",
+    "/generate_kouminkan_shiyo":   "kouminkan_shiyo",
+    "/generate_kouminkan_genmen":  "kouminkan_genmen",
+    "/generate_kouminkan_chushi":  "kouminkan_chushi",
+}
 
-
-@app.route("/shogai", methods=["GET"])
-def shogai():
-    return render_template("shogai.html")
-
-
-@app.route("/generate_shogai_jigyo", methods=["POST"])
-def generate_shogai_jigyo():
-    context = {
-        "todoke_nen":   request.form.get("todoke_nen", ""),
-        "todoke_tsuki": request.form.get("todoke_tsuki", ""),
-        "todoke_hi":    request.form.get("todoke_hi", ""),
-        "shozaichi":    request.form.get("shozaichi", ""),
-        "meisho":       request.form.get("meisho", ""),
-        "daihyo":       request.form.get("daihyo", ""),
-        "tel":          request.form.get("tel", ""),
-        "kaishi_nen":        request.form.get("kaishi_nen", ""),
-        "kaishi_tsuki":      request.form.get("kaishi_tsuki", ""),
-        "kaishi_hi":         request.form.get("kaishi_hi", ""),
-        "jigyo_shurui":      request.form.get("jigyo_shurui", ""),
-        "jigyo_naiyou":      request.form.get("jigyo_naiyou", ""),
-        "keieisha_shimei":   request.form.get("keieisha_shimei", ""),
-        "keieisha_jusho":    request.form.get("keieisha_jusho", ""),
-        "shisetsu_meisho":   request.form.get("shisetsu_meisho", ""),
-        "shisetsu_shurui":   request.form.get("shisetsu_shurui", ""),
-        "shisetsu_shozaichi": request.form.get("shisetsu_shozaichi", ""),
-        "nyusho_teiin":      request.form.get("nyusho_teiin", ""),
-    }
-    doc = DocxTemplate(SHOGAI_JIGYO)
-    doc.render(context)
-    buffer = io.BytesIO()
-    doc.save(buffer)
-    buffer.seek(0)
-    safe = context["meisho"].replace(" ", "_").replace("　", "_") or "届出者"
-    return send_file(buffer, as_attachment=True,
-                     download_name=f"障害福祉サービス事業等開始届_{safe}.docx",
-                     mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-
-
-@app.route("/noshin", methods=["GET"])
-def noshin():
-    return render_template("noshin.html")
-
-
-@app.route("/generate_noshin_moushide", methods=["POST"])
-def generate_noshin_moushide():
-    context = {
-        "moushide_date":    request.form.get("moushide_date", ""),
-        "shinshutsu_zip":   request.form.get("shinshutsu_zip", ""),
-        "shinshutsu_jusho": request.form.get("shinshutsu_jusho", ""),
-        "shinshutsu_tel":   request.form.get("shinshutsu_tel", ""),
-        "shinshutsu_shimei": request.form.get("shinshutsu_shimei", ""),
-        "daiko_zip":        request.form.get("daiko_zip", ""),
-        "daiko_jusho":      request.form.get("daiko_jusho", ""),
-        "daiko_tel":        request.form.get("daiko_tel", ""),
-        "daiko_shimei":     request.form.get("daiko_shimei", ""),
-        "oaza":             request.form.get("oaza", ""),
-        "aza":              request.form.get("aza", ""),
-        "chiban":           request.form.get("chiban", ""),
-        "chimoku":          request.form.get("chimoku", ""),
-        "menseki":          request.form.get("menseki", ""),
-        "shoyu":            request.form.get("shoyu", ""),
-        "henko_riyu":       request.form.get("henko_riyu", ""),
-        # セクション3〜7
-        "sentei_riyu":      request.form.get("sentei_riyu", ""),
-        "nochi_jokyo":      request.form.get("nochi_jokyo", ""),
-        "koko_toshi":       request.form.get("koko_toshi", ""),
-        "osui_shori":       request.form.get("osui_shori", ""),
-        "nicchou":          request.form.get("nicchou", ""),
-        "sonota_eikyou":    request.form.get("sonota_eikyou", ""),
-        "jigyo_shutai":     request.form.get("jigyo_shutai", ""),
-        "kuiki_nai_menseki": request.form.get("kuiki_nai_menseki", ""),
-        "kuiki_gai_menseki": request.form.get("kuiki_gai_menseki", ""),
-        "shisetsu_menseki": request.form.get("shisetsu_menseki", ""),
-        "jigyo_hi":         request.form.get("jigyo_hi", ""),
-        "ta_genzai":        request.form.get("ta_genzai", ""),
-        "ta_ato":           request.form.get("ta_ato", ""),
-        "hata_genzai":      request.form.get("hata_genzai", ""),
-        "hata_ato":         request.form.get("hata_ato", ""),
-        "senkyo_kenbyo":    request.form.get("senkyo_kenbyo", ""),
-    }
-    doc = DocxTemplate(NOSHIN_MOUSHIDE)
-    doc.render(context)
-    buffer = io.BytesIO()
-    doc.save(buffer)
-    buffer.seek(0)
-    safe = context["shinshutsu_shimei"].replace(" ", "_").replace("　", "_") or "申請者"
-    return send_file(buffer, as_attachment=True,
-                     download_name=f"農業振興地域整備計画変更申出書_{safe}.docx",
-                     mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-
-
-@app.route("/suido", methods=["GET"])
-def suido():
-    return render_template("suido.html")
-
-
-@app.route("/generate_suido_syoyusha", methods=["POST"])
-def generate_suido_syoyusha():
-    context = {
-        "todoke_date":        request.form.get("todoke_date", ""),
-        "shutsu_jusho":       request.form.get("shutsu_jusho", ""),
-        "shutsu_shimei":      request.form.get("shutsu_shimei", ""),
-        "settichi":           request.form.get("settichi", ""),
-        "settichi_tatemono":  request.form.get("settichi_tatemono", ""),
-        "jyoto_date":         request.form.get("jyoto_date", ""),
-        "mae_jusho":          request.form.get("mae_jusho", ""),
-        "mae_shimei":         request.form.get("mae_shimei", ""),
-        "ato_jusho":          request.form.get("ato_jusho", ""),
-        "ato_shimei":         request.form.get("ato_shimei", ""),
-        "jyoto_riyu":         request.form.get("jyoto_riyu", ""),
-    }
-    doc = DocxTemplate(SUIDO_SYOYUSHA)
-    doc.render(context)
-    buffer = io.BytesIO()
-    doc.save(buffer)
-    buffer.seek(0)
-    safe = context["ato_shimei"].replace(" ", "_").replace("　", "_") or "申請者"
-    return send_file(buffer, as_attachment=True,
-                     download_name=f"排水設備所有者変更届_{safe}.docx",
-                     mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-
-
-@app.route("/kouminkan", methods=["GET"])
-def kouminkan():
-    return render_template("kouminkan.html")
-
-
-def _kouminkan_context():
-    ctx = {
-        "shinsei_date":   request.form.get("shinsei_date", ""),
-        "kouminkan_name": request.form.get("kouminkan_name", ""),
-        "jusho":          request.form.get("jusho", ""),
-        "dantai_name":    request.form.get("dantai_name", ""),
-        "daihyo_name":    request.form.get("daihyo_name", ""),
-        "denwa":          request.form.get("denwa", ""),
-        "shiyou_mokuteki": request.form.get("shiyou_mokuteki", ""),
-        "shiyou_ninzu":   request.form.get("shiyou_ninzu", ""),
-    }
-    # 使用日程（5行分）
-    for i in range(1, 6):
-        ctx[f"date_{i}"]  = request.form.get(f"date_{i}", "")
-        ctx[f"room_{i}"]  = request.form.get(f"room_{i}", "")
-        ctx[f"time_{i}"]  = request.form.get(f"time_{i}", "")
-        ctx[f"biko_{i}"]  = request.form.get(f"biko_{i}", "")
-    return ctx
-
-
-@app.route("/generate_kouminkan_shiyo", methods=["POST"])
-def generate_kouminkan_shiyo():
-    context = _kouminkan_context()
-    doc = DocxTemplate(KOUMINKAN_SHIYO)
-    doc.render(context)
-    buffer = io.BytesIO()
-    doc.save(buffer)
-    buffer.seek(0)
-    safe = context["dantai_name"].replace(" ", "_").replace("　", "_") or "申請者"
-    return send_file(buffer, as_attachment=True,
-                     download_name=f"公民館使用許可申請書_{safe}.docx",
-                     mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-
-
-@app.route("/generate_kouminkan_genmen", methods=["POST"])
-def generate_kouminkan_genmen():
-    context = _kouminkan_context()
-    doc = DocxTemplate(KOUMINKAN_GENMEN)
-    doc.render(context)
-    buffer = io.BytesIO()
-    doc.save(buffer)
-    buffer.seek(0)
-    safe = context["dantai_name"].replace(" ", "_").replace("　", "_") or "申請者"
-    return send_file(buffer, as_attachment=True,
-                     download_name=f"公民館使用料減免申請書_{safe}.docx",
-                     mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-
-
-@app.route("/generate_kouminkan_chushi", methods=["POST"])
-def generate_kouminkan_chushi():
-    ctx = {
-        "shinsei_date":   request.form.get("shinsei_date", ""),
-        "kouminkan_name": request.form.get("kouminkan_name", ""),
-        "jusho":          request.form.get("jusho", ""),
-        "dantai_name":    request.form.get("dantai_name", ""),
-        "daihyo_name":    request.form.get("daihyo_name", ""),
-        "denwa":          request.form.get("denwa", ""),
-    }
-    doc = DocxTemplate(KOUMINKAN_CHUSHI)
-    doc.render(ctx)
-    buffer = io.BytesIO()
-    doc.save(buffer)
-    buffer.seek(0)
-    safe = ctx["dantai_name"].replace(" ", "_").replace("　", "_") or "申請者"
-    return send_file(buffer, as_attachment=True,
-                     download_name=f"公民館使用中止届_{safe}.docx",
-                     mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+for url, form_id in LEGACY_ENDPOINTS.items():
+    app.add_url_rule(url, endpoint=f"legacy_{form_id}", methods=["POST"],
+                     view_func=(lambda form_id=form_id: generate(form_id)))
 
 
 if __name__ == "__main__":
