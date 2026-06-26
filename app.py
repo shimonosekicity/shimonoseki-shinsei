@@ -28,6 +28,9 @@ PAGES = {
     "/kurashi_support":     "kurashi_support.html",
     "/ijuu_shien":          "ijuu_shien.html",
     "/kekkon_shinseikatsu": "kekkon_shinseikatsu.html",
+    "/jutaku_konyuu":       "jutaku_konyuu.html",
+    "/telework_ijuu":       "telework_ijuu.html",
+    "/yytan_kotsuhi":       "yytan_kotsuhi.html",
 }
 
 for url, page in PAGES.items():
@@ -187,6 +190,21 @@ FORMS = {
         "template": "kekkon_shinseikatsu_template.docx",
         "filename": "結婚新生活支援補助金交付申請書",
         "name_fields": ["otto_shimei", "tsuma_shimei"],
+    },
+    "jutaku_konyuu": {
+        "template": "jutaku_konyuu_template.docx",
+        "filename": "移住者向け住宅購入支援事業補助金交付申請書",
+        "name_fields": ["shimei"],
+    },
+    "telework_ijuu": {
+        "template": "telework_ijuu_template.docx",
+        "filename": "やまぐち創生テレワーク移住支援事業補助金交付申請書",
+        "name_fields": ["shimei"],
+    },
+    "yytan_kotsuhi": {
+        "template": "yytan_kotsuhi_template.docx",
+        "filename": "YYターン支援交通費補助金申請書",
+        "name_fields": ["shimei"],
     },
 }
 

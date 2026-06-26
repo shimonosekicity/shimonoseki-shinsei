@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+{% block title %}やまぐち創生テレワーク移住支援事業補助金交付申請書 作成フォーム{% endblock %}
+{% block accent %}#1a5c7a{% endblock %}
+{% block header_title %}やまぐち創生テレワーク移住支援事業補助金　交付申請書　作成フォーム{% endblock %}
+{% block header_sub %}下関市共創イノベーション課{% endblock %}
+
+{% block content %}
+  <form id="mainForm" action="/generate/telework_ijuu" method="POST" novalidate>
+
+    <input type="hidden" name="shinsei_date" id="h_shinsei_date">
+    <input type="hidden" name="seinengappi" id="h_seinengappi">
+    <input type="hidden" name="tennyu_date" id="h_tennyu_date">
+    <input type="hidden" name="telework_start_date" id="h_telework_start">
+
+    <!-- 対象者案内 -->
+    <div class="card" style="background:#ebf4ff;border-color:#1a5c7a">
+      <h2 style="color:#0a2a3c">対象者・補助額について</h2>
+      <ul style="font-size:0.88rem;line-height:1.8;padding-left:1.2em">
+        <li>大都市圏（大阪圏・名古屋圏・福岡圏等）から下関市へ移住しテレワークを行う方</li>
+        <li>移住前の勤務先で週20時間以上テレワークを継続すること</li>
+        <li><b>補助額：</b>単身30万円 ／ 世帯（2人以上）50万円</li>
+        <li><b>加算：</b>18歳未満の子1人につき50万円（令和6年4月1日以降の移住者）</li>
+      </ul>
+    </div>
+
+    <!-- 申請日 -->
+    <div class="card">
+      <h2>申請日</h2>
+      <div class="field">
+        <label>申請日<span class="required">必須</span></label>
+        <div class="date-row">
+          <select id="shinsei_era" class="era-sel"><option value="令和" selected>令和</option></select>
+          <input type="number" id="shinsei_year" class="year-num" min="1" max="99" placeholder="年">
+          <span class="date-lbl">年</span>
+          <select id="shinsei_month" class="month-sel"><option value="">--</option></select>
+          <span class="date-lbl">月</span>
+          <select id="shinsei_day" class="day-sel"><option value="">--</option></select>
+          <span class="date-lbl">日</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 申請者情報 -->
+    <div class="card">
+      <h2>申請者情報</h2>
+      <div class="row">
+        <div class="field">
+          <label>氏名<span class="required">必須</span></label>
+          <input type="text" name="shimei" placeholder="山田 太郎" required>
+        </div>
+        <div class="field">
+          <label>ふりがな<span class="required">必須</span></label>
+          <input type="text" name="shimei_kana" placeholder="やまだ たろう" required>
+        </div>
+      </div>
+      <div class="field">
+        <label>現住所（下関市内）<span class="required">必須</span><span class="hint">郵便番号から自動入力</span></label>
+        <div class="zip-row">
+          <input type="text" id="zip1" placeholder="例：7500031" maxlength="8">
+          <button type="button" class="zip-btn" onclick="searchZip('zip1','jusho_input')">住所を検索</button>
+        </div>
+        <div id="zip1_msg" class="zip-msg"></div>
+        <input type="text" name="jusho" id="jusho_input" placeholder="下関市竹崎町1丁目1番1号（番地・部屋番号まで入力）" required>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>電話番号<span class="required">必須</span></label>
+          <input type="text" name="denwa" placeholder="083-231-1111" required>
+        </div>
+        <div class="field">
+          <label>年齢<span class="required">必須</span></label>
+          <input type="number" name="nenrei" placeholder="35" min="0" max="120" required>
+        </div>
+      </div>
+      <div class="field">
+        <label>生年月日<span class="required">必須</span></label>
+        <div class="date-row">
+          <select id="sei_era" class="era-sel">
+            <option value="昭和" selected>昭和</option>
+            <option value="平成">平成</option>
+            <option value="令和">令和</option>
+          </select>
+          <input type="number" id="sei_year" class="year-num" min="1" max="99" placeholder="年">
+          <span class="date-lbl">年</span>
+          <select id="sei_month" class="month-sel"><option value="">--</option></select>
+          <span class="date-lbl">月</span>
+          <select id="sei_day" class="day-sel"><option value="">--</option></select>
+          <span class="date-lbl">日</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 転入情報 -->
+    <div class="card">
+      <h2>転入情報</h2>
+      <div class="field">
+        <label>転入年月日<span class="required">必須</span></label>
+        <div class="date-row">
+          <select id="ten_era" class="era-sel"><option value="令和" selected>令和</option></select>
+          <input type="number" id="ten_year" class="year-num" min="1" max="99" placeholder="年">
+          <span class="date-lbl">年</span>
+          <select id="ten_month" class="month-sel"><option value="">--</option></select>
+          <span class="date-lbl">月</span>
+          <select id="ten_day" class="day-sel"><option value="">--</option></select>
+          <span class="date-lbl">日</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>転入前の住所（大都市圏の住所）<span class="required">必須</span><span class="hint">郵便番号から自動入力</span></label>
+        <div class="zip-row">
+          <input type="text" id="zip2" placeholder="例：5300001" maxlength="8">
+          <button type="button" class="zip-btn" onclick="searchZip('zip2','mae_jusho_input')">住所を検索</button>
+        </div>
+        <div id="zip2_msg" class="zip-msg"></div>
+        <input type="text" name="mae_jusho" id="mae_jusho_input" placeholder="大阪府大阪市北区梅田1丁目1番1号" required>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>大都市圏での在住期間<span class="required">必須</span></label>
+          <input type="text" name="zaiju_kikan" placeholder="3年6ヶ月" required>
+        </div>
+        <div class="field">
+          <label>転入前の職業</label>
+          <input type="text" name="mae_shokugyo" placeholder="IT企業 エンジニア">
+        </div>
+      </div>
+    </div>
+
+    <!-- テレワーク就業情報 -->
+    <div class="card">
+      <h2>テレワーク就業情報</h2>
+      <div class="field">
+        <label>勤務先名（移住前からの勤務先）<span class="required">必須</span></label>
+        <input type="text" name="kinmusaki_name" placeholder="株式会社○○" required>
+      </div>
+      <div class="field">
+        <label>勤務先所在地<span class="required">必須</span></label>
+        <input type="text" name="kinmusaki_jusho" placeholder="大阪府大阪市北区梅田1丁目" required>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>雇用形態<span class="required">必須</span></label>
+          <select name="koyo_keitai" required>
+            <option value="">選択</option>
+            <option value="正規雇用">正規雇用</option>
+            <option value="非正規雇用">非正規雇用</option>
+            <option value="業務委託・フリーランス">業務委託・フリーランス</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>週あたりテレワーク時間数<span class="required">必須</span></label>
+          <input type="number" name="telework_jikan" placeholder="20" min="20" required>
+          <span class="hint">週20時間以上が要件</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>テレワーク開始日<span class="required">必須</span></label>
+        <div class="date-row">
+          <select id="tw_era" class="era-sel"><option value="令和" selected>令和</option></select>
+          <input type="number" id="tw_year" class="year-num" min="1" max="99" placeholder="年">
+          <span class="date-lbl">年</span>
+          <select id="tw_month" class="month-sel"><option value="">--</option></select>
+          <span class="date-lbl">月</span>
+          <select id="tw_day" class="day-sel"><option value="">--</option></select>
+          <span class="date-lbl">日</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>テレワーク業務内容<span class="required">必須</span></label>
+        <textarea name="telework_naiyou" rows="2" placeholder="例：Webシステムの開発・保守業務" required></textarea>
+      </div>
+      <div class="field">
+        <label>帯同する18歳未満の子の人数<span class="required">必須</span></label>
+        <input type="number" name="kodomo_count" placeholder="0" min="0" max="20" value="0" required>
+        <span class="hint">0人でも入力してください。子1人につき50万円加算（令和6年4月以降移住）</span>
+      </div>
+    </div>
+
+    <!-- 振込先 -->
+    <div class="card">
+      <h2>補助金振込先（口座情報）</h2>
+      <div class="row">
+        <div class="field">
+          <label>金融機関名<span class="required">必須</span></label>
+          <input type="text" name="ginko_name" placeholder="○○銀行" required>
+        </div>
+        <div class="field">
+          <label>支店名<span class="required">必須</span></label>
+          <input type="text" name="shiten_name" placeholder="下関支店" required>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>口座種別<span class="required">必須</span></label>
+          <select name="koza_shubetsu" required>
+            <option value="">選択</option>
+            <option value="普通">普通</option>
+            <option value="当座">当座</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>口座番号<span class="required">必須</span></label>
+          <input type="text" name="koza_bango" placeholder="1234567" required>
+        </div>
+      </div>
+      <div class="field">
+        <label>口座名義人（カタカナ）<span class="required">必須</span></label>
+        <input type="text" name="koza_meigi" placeholder="ヤマダ タロウ" required>
+      </div>
+    </div>
+
+    <!-- 備考 -->
+    <div class="card">
+      <h2>備考</h2>
+      <div class="field">
+        <label>特記事項・備考</label>
+        <textarea name="biko" rows="3" placeholder="特記事項があれば入力してください"></textarea>
+      </div>
+    </div>
+
+    <!-- 添付書類 -->
+    <div class="card">
+      <h2>添付書類（申請時に持参してください）</h2>
+      <div class="checklist">
+        <p>以下の書類を準備してください：</p>
+        <ul>
+          <li>住民票（転入後のもの）</li>
+          <li>転入前の住所が確認できる書類（住民票の除票等）</li>
+          <li>就業証明書【テレワーク】（下関市様式第３号または同等のもの）</li>
+          <li>雇用契約書等の写し（雇用関係が確認できるもの）</li>
+          <li>テレワーク実施状況が確認できる書類（勤務先の証明等）</li>
+          <li>通帳の写し（金融機関名・支店名・口座番号・名義人が確認できるページ）</li>
+          <li>子の続柄が確認できる書類（子の加算がある場合）</li>
+        </ul>
+      </div>
+    </div>
+
+    {% set submit_label = "申請書を作成してダウンロード" %}
+    {% include "_submit.html" %}
+  </form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  bindZip({ zip1: 'jusho_input', zip2: 'mae_jusho_input' });
+
+  document.getElementById('mainForm').addEventListener('submit', function(e) {
+    const shinsei = combineDate('shinsei_era','shinsei_year','shinsei_month','shinsei_day');
+    const sei     = combineDate('sei_era','sei_year','sei_month','sei_day');
+    const ten     = combineDate('ten_era','ten_year','ten_month','ten_day');
+    const tw      = combineDate('tw_era','tw_year','tw_month','tw_day');
+    const errors  = [];
+    if (!shinsei) errors.push('申請日');
+    if (!sei)     errors.push('生年月日');
+    if (!ten)     errors.push('転入年月日');
+    if (!tw)      errors.push('テレワーク開始日');
+    if (errors.length > 0) {
+      e.preventDefault();
+      alert('以下の項目を入力してください：\n・' + errors.join('\n・'));
+      return;
+    }
+    document.getElementById('h_shinsei_date').value  = shinsei;
+    document.getElementById('h_seinengappi').value   = sei;
+    document.getElementById('h_tennyu_date').value   = ten;
+    document.getElementById('h_telework_start').value = tw;
+  });
+
+  fillMonthDay();
+  setToday('shinsei_year','shinsei_month','shinsei_day');
+</script>
+{% endblock %}
