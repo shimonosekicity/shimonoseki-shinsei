@@ -84,6 +84,39 @@ TIME_CHECKS = {
 }
 
 
+def kurashi_support_extra(form, ctx):
+    try:
+        yachin = int(str(form.get("yachin_getsugaku", "0")).replace(",", ""))
+    except ValueError:
+        yachin = 0
+    try:
+        tsuki = int(form.get("hoshu_tsuki", "0"))
+    except ValueError:
+        tsuki = 0
+
+    half = yachin // 2
+    monthly = (half // 1000) * 1000
+    cap = 20000 if form.get("setai_kubun") == "child" else 10000
+    monthly = min(monthly, cap)
+
+    # 家賃支払月の終了月を計算
+    start_str = form.get("yachin_start_month", "")  # 例: 令和7年4月
+    end_str = ""
+    import re as _re
+    m = _re.match(r"(令和|平成)(\d+)年(\d+)月", start_str)
+    if m and tsuki > 0:
+        era, y, mon = m.group(1), int(m.group(2)), int(m.group(3))
+        total_months = (y - 1) * 12 + mon + tsuki - 1
+        end_y = (total_months - 1) // 12 + 1
+        end_mon = (total_months - 1) % 12 + 1
+        end_str = f"{era}{end_y}年{end_mon}月"
+
+    ctx["yachin_half"] = f"{half:,}"
+    ctx["hoshu_gaku_monthly"] = f"{monthly:,}"
+    ctx["yachin_end_month"] = end_str
+    ctx["hoshu_gokei"] = f"{monthly * tsuki:,}"
+
+
 def kouminkan_extra(form, ctx):
     # 入力済みの日程行だけを集めて1行目から詰める
     rows = []
@@ -180,6 +213,7 @@ FORMS = {
         "template": "kurashi_support_template.docx",
         "filename": "暮らしサポート補助金交付申請書",
         "name_fields": ["shimei"],
+        "extra": kurashi_support_extra,
     },
     "ijuu_shien": {
         "template": "ijuu_shien_template.docx",
