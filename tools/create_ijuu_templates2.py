@@ -164,37 +164,6 @@ def create_jutaku_konyuu():
     set_col_width(tbl2, 0, 3.0); set_col_width(tbl2, 1, 5.5)
     set_col_width(tbl2, 2, 3.0); set_col_width(tbl2, 3, 5.5)
 
-    doc.add_paragraph()
-
-    # 振込先
-    add_section_heading(doc, '■ 補助金振込先（口座情報）')
-    tbl3 = doc.add_table(rows=3, cols=4)
-    tbl3.alignment = WD_TABLE_ALIGNMENT.CENTER
-    set_table_border(tbl3)
-    data3 = [
-        ('金融機関名', '{{ ginko_name }}', '支店名', '{{ shiten_name }}'),
-        ('口座種別', '{{ koza_shubetsu }}', '口座番号', '{{ koza_bango }}'),
-        ('口座名義人', '{{ koza_meigi }}', '', ''),
-    ]
-    for i, (l1, v1, l2, v2) in enumerate(data3):
-        row = tbl3.rows[i]
-        label_cell(row.cells[0], l1)
-        value_cell(row.cells[1], v1)
-        label_cell(row.cells[2], l2)
-        value_cell(row.cells[3], v2)
-    set_col_width(tbl3, 0, 3.0); set_col_width(tbl3, 1, 5.5)
-    set_col_width(tbl3, 2, 3.0); set_col_width(tbl3, 3, 5.5)
-
-    doc.add_paragraph()
-
-    add_section_heading(doc, '■ 備考')
-    tbl4 = doc.add_table(rows=1, cols=1)
-    tbl4.alignment = WD_TABLE_ALIGNMENT.CENTER
-    set_table_border(tbl4)
-    cell = tbl4.rows[0].cells[0]
-    cell.paragraphs[0].add_run('{{ biko }}').font.size = Pt(10)
-    cell.width = Cm(17)
-
     path = os.path.join(ROOT, 'jutaku_konyuu_template.docx')
     doc.save(path)
     print('ok: jutaku_konyuu_template.docx')
@@ -279,37 +248,6 @@ def create_telework_ijuu():
         value_cell(row.cells[3], v2)
     set_col_width(tbl2, 0, 3.0); set_col_width(tbl2, 1, 5.5)
     set_col_width(tbl2, 2, 3.0); set_col_width(tbl2, 3, 5.5)
-
-    doc.add_paragraph()
-
-    # 振込先
-    add_section_heading(doc, '■ 補助金振込先（口座情報）')
-    tbl3 = doc.add_table(rows=3, cols=4)
-    tbl3.alignment = WD_TABLE_ALIGNMENT.CENTER
-    set_table_border(tbl3)
-    data3 = [
-        ('金融機関名', '{{ ginko_name }}', '支店名', '{{ shiten_name }}'),
-        ('口座種別', '{{ koza_shubetsu }}', '口座番号', '{{ koza_bango }}'),
-        ('口座名義人', '{{ koza_meigi }}', '', ''),
-    ]
-    for i, (l1, v1, l2, v2) in enumerate(data3):
-        row = tbl3.rows[i]
-        label_cell(row.cells[0], l1)
-        value_cell(row.cells[1], v1)
-        label_cell(row.cells[2], l2)
-        value_cell(row.cells[3], v2)
-    set_col_width(tbl3, 0, 3.0); set_col_width(tbl3, 1, 5.5)
-    set_col_width(tbl3, 2, 3.0); set_col_width(tbl3, 3, 5.5)
-
-    doc.add_paragraph()
-
-    add_section_heading(doc, '■ 備考')
-    tbl4 = doc.add_table(rows=1, cols=1)
-    tbl4.alignment = WD_TABLE_ALIGNMENT.CENTER
-    set_table_border(tbl4)
-    cell = tbl4.rows[0].cells[0]
-    cell.paragraphs[0].add_run('{{ biko }}').font.size = Pt(10)
-    cell.width = Cm(17)
 
     path = os.path.join(ROOT, 'telework_ijuu_template.docx')
     doc.save(path)
@@ -400,37 +338,6 @@ def create_yytan_kotsuhi():
     run = p.add_run('交通費合計：{{ kotsuhi_gokei }}円　　補助申請額：{{ hoshu_gaku }}円')
     run.font.size = Pt(11)
     run.font.bold = True
-
-    doc.add_paragraph()
-
-    # 振込先
-    add_section_heading(doc, '■ 補助金振込先（口座情報）')
-    tbl3 = doc.add_table(rows=3, cols=4)
-    tbl3.alignment = WD_TABLE_ALIGNMENT.CENTER
-    set_table_border(tbl3)
-    data3 = [
-        ('金融機関名', '{{ ginko_name }}', '支店名', '{{ shiten_name }}'),
-        ('口座種別', '{{ koza_shubetsu }}', '口座番号', '{{ koza_bango }}'),
-        ('口座名義人', '{{ koza_meigi }}', '', ''),
-    ]
-    for i, (l1, v1, l2, v2) in enumerate(data3):
-        row = tbl3.rows[i]
-        label_cell(row.cells[0], l1)
-        value_cell(row.cells[1], v1)
-        label_cell(row.cells[2], l2)
-        value_cell(row.cells[3], v2)
-    set_col_width(tbl3, 0, 3.0); set_col_width(tbl3, 1, 5.5)
-    set_col_width(tbl3, 2, 3.0); set_col_width(tbl3, 3, 5.5)
-
-    doc.add_paragraph()
-
-    add_section_heading(doc, '■ 備考')
-    tbl4 = doc.add_table(rows=1, cols=1)
-    tbl4.alignment = WD_TABLE_ALIGNMENT.CENTER
-    set_table_border(tbl4)
-    cell = tbl4.rows[0].cells[0]
-    cell.paragraphs[0].add_run('{{ biko }}').font.size = Pt(10)
-    cell.width = Cm(17)
 
     path = os.path.join(ROOT, 'yytan_kotsuhi_template.docx')
     doc.save(path)
