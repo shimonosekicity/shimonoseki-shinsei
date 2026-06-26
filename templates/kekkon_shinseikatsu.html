@@ -1,0 +1,329 @@
+{% extends "base.html" %}
+{% block title %}結婚新生活支援補助金交付申請書 作成フォーム{% endblock %}
+{% block accent %}#7a1a5c{% endblock %}
+{% block header_title %}結婚新生活支援補助金　交付申請書　作成フォーム{% endblock %}
+{% block header_sub %}下関市結婚新生活支援事業{% endblock %}
+
+{% block content %}
+  <form id="mainForm" action="/generate/kekkon_shinseikatsu" method="POST" novalidate>
+
+    <input type="hidden" name="shinsei_date" id="h_shinsei_date">
+    <input type="hidden" name="otto_seinengappi" id="h_otto_sei">
+    <input type="hidden" name="tsuma_seinengappi" id="h_tsuma_sei">
+    <input type="hidden" name="konin_date" id="h_konin_date">
+    <input type="hidden" name="nyukyo_date" id="h_nyukyo_date">
+    <input type="hidden" name="hoshu_gokei" id="h_hoshu_gokei">
+
+    <!-- 対象者案内 -->
+    <div class="card" style="background:#fef6ff;border-color:#7a1a5c">
+      <h2 style="color:#4a0a3c">対象者について</h2>
+      <ul style="font-size:0.88rem;line-height:1.8;padding-left:1.2em">
+        <li>婚姻した夫婦（令和8年3月31日までに婚姻届受理）</li>
+        <li>夫婦の年齢がともに39歳以下（婚姻日時点）</li>
+        <li>世帯の合計所得が500万円未満</li>
+        <li>補助対象：住居費（家賃・購入費）・引越費用・リフォーム費用（上限60万円）</li>
+      </ul>
+    </div>
+
+    <!-- 申請日 -->
+    <div class="card">
+      <h2>申請日</h2>
+      <div class="field">
+        <label>申請日<span class="required">必須</span></label>
+        <div class="date-row">
+          <select id="shinsei_era" class="era-sel">
+            <option value="令和" selected>令和</option>
+          </select>
+          <input type="number" id="shinsei_year" class="year-num" min="1" max="99" placeholder="年">
+          <span class="date-lbl">年</span>
+          <select id="shinsei_month" class="month-sel"><option value="">--</option></select>
+          <span class="date-lbl">月</span>
+          <select id="shinsei_day" class="day-sel"><option value="">--</option></select>
+          <span class="date-lbl">日</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 夫情報 -->
+    <div class="card">
+      <h2>夫の情報</h2>
+      <div class="row">
+        <div class="field">
+          <label>氏名<span class="required">必須</span></label>
+          <input type="text" name="otto_shimei" placeholder="山田 太郎" required>
+        </div>
+        <div class="field">
+          <label>ふりがな<span class="required">必須</span></label>
+          <input type="text" name="otto_kana" placeholder="やまだ たろう" required>
+        </div>
+      </div>
+      <div class="field">
+        <label>生年月日<span class="required">必須</span></label>
+        <div class="date-row">
+          <select id="otto_sei_era" class="era-sel">
+            <option value="昭和" selected>昭和</option>
+            <option value="平成">平成</option>
+            <option value="令和">令和</option>
+          </select>
+          <input type="number" id="otto_sei_year" class="year-num" min="1" max="99" placeholder="年">
+          <span class="date-lbl">年</span>
+          <select id="otto_sei_month" class="month-sel"><option value="">--</option></select>
+          <span class="date-lbl">月</span>
+          <select id="otto_sei_day" class="day-sel"><option value="">--</option></select>
+          <span class="date-lbl">日</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 妻情報 -->
+    <div class="card">
+      <h2>妻の情報</h2>
+      <div class="row">
+        <div class="field">
+          <label>氏名<span class="required">必須</span></label>
+          <input type="text" name="tsuma_shimei" placeholder="山田 花子" required>
+        </div>
+        <div class="field">
+          <label>ふりがな<span class="required">必須</span></label>
+          <input type="text" name="tsuma_kana" placeholder="やまだ はなこ" required>
+        </div>
+      </div>
+      <div class="field">
+        <label>生年月日<span class="required">必須</span></label>
+        <div class="date-row">
+          <select id="tsuma_sei_era" class="era-sel">
+            <option value="昭和" selected>昭和</option>
+            <option value="平成">平成</option>
+            <option value="令和">令和</option>
+          </select>
+          <input type="number" id="tsuma_sei_year" class="year-num" min="1" max="99" placeholder="年">
+          <span class="date-lbl">年</span>
+          <select id="tsuma_sei_month" class="month-sel"><option value="">--</option></select>
+          <span class="date-lbl">月</span>
+          <select id="tsuma_sei_day" class="day-sel"><option value="">--</option></select>
+          <span class="date-lbl">日</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 婚姻・新居情報 -->
+    <div class="card">
+      <h2>婚姻・新居情報</h2>
+      <div class="field">
+        <label>婚姻届受理日<span class="required">必須</span></label>
+        <div class="date-row">
+          <select id="konin_era" class="era-sel">
+            <option value="令和" selected>令和</option>
+          </select>
+          <input type="number" id="konin_year" class="year-num" min="1" max="99" placeholder="年">
+          <span class="date-lbl">年</span>
+          <select id="konin_month" class="month-sel"><option value="">--</option></select>
+          <span class="date-lbl">月</span>
+          <select id="konin_day" class="day-sel"><option value="">--</option></select>
+          <span class="date-lbl">日</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>新居住所（下関市内）<span class="required">必須</span><span class="hint">郵便番号から自動入力</span></label>
+        <div class="zip-row">
+          <input type="text" id="zip1" placeholder="例：7500031" maxlength="8">
+          <button type="button" class="zip-btn" onclick="searchZip('zip1','shinkyo_input')">住所を検索</button>
+        </div>
+        <div id="zip1_msg" class="zip-msg"></div>
+        <input type="text" name="shinkyo_jusho" id="shinkyo_input" placeholder="下関市竹崎町1丁目1番1号（番地・部屋番号まで入力）" required>
+      </div>
+      <div class="field">
+        <label>入居年月日<span class="required">必須</span></label>
+        <div class="date-row">
+          <select id="nyu_era" class="era-sel">
+            <option value="令和" selected>令和</option>
+          </select>
+          <input type="number" id="nyu_year" class="year-num" min="1" max="99" placeholder="年">
+          <span class="date-lbl">年</span>
+          <select id="nyu_month" class="month-sel"><option value="">--</option></select>
+          <span class="date-lbl">月</span>
+          <select id="nyu_day" class="day-sel"><option value="">--</option></select>
+          <span class="date-lbl">日</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>住居形態<span class="required">必須</span></label>
+          <select name="jutaku_keitai" required>
+            <option value="">選択してください</option>
+            <option value="賃貸">賃貸</option>
+            <option value="持家（新築購入）">持家（新築購入）</option>
+            <option value="持家（中古購入）">持家（中古購入）</option>
+            <option value="持家（リフォーム）">持家（リフォーム）</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>世帯合計所得（万円）<span class="required">必須</span></label>
+          <input type="number" name="setai_shotoku" placeholder="350" min="0" max="4999" required>
+          <span class="hint">500万円未満が対象</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>転入前住所<span class="hint">下関市外から転入の場合</span></label>
+        <input type="text" name="mae_jusho" placeholder="（該当する場合のみ）福岡県福岡市中央区天神1丁目1番1号">
+      </div>
+    </div>
+
+    <!-- 補助申請内容 -->
+    <div class="card">
+      <h2>補助申請内容</h2>
+      <p style="font-size:0.85rem;color:#718096;margin-bottom:12px">
+        ※ 申請する費用の欄に金額を入力してください（複数選択可）。補助上限は合計60万円です。
+      </p>
+      <div class="row">
+        <div class="field">
+          <label>住居賃借費（家賃・敷金・礼金等）</label>
+          <input type="text" name="yachin_gaku" placeholder="0" id="cost1" oninput="calcTotal()">
+          <span class="hint">円</span>
+        </div>
+        <div class="field">
+          <label>備考（住居賃借費）</label>
+          <input type="text" name="yachin_biko" placeholder="〇月分 家賃 ×〇ヶ月分 など">
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>住居取得費（購入・建築費）</label>
+          <input type="text" name="konya_gaku" placeholder="0" id="cost2" oninput="calcTotal()">
+          <span class="hint">円</span>
+        </div>
+        <div class="field">
+          <label>備考（住居取得費）</label>
+          <input type="text" name="konya_biko" placeholder="新築購入費 など">
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>引越費用</label>
+          <input type="text" name="hikkoshi_gaku" placeholder="0" id="cost3" oninput="calcTotal()">
+          <span class="hint">円</span>
+        </div>
+        <div class="field">
+          <label>備考（引越費用）</label>
+          <input type="text" name="hikkoshi_biko" placeholder="引越業者名 など">
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>リフォーム費用</label>
+          <input type="text" name="reform_gaku" placeholder="0" id="cost4" oninput="calcTotal()">
+          <span class="hint">円</span>
+        </div>
+        <div class="field">
+          <label>備考（リフォーム費用）</label>
+          <input type="text" name="reform_biko" placeholder="リフォーム内容 など">
+        </div>
+      </div>
+      <div class="field" style="margin-top:8px">
+        <label>補助申請額合計（自動計算）</label>
+        <div id="total_display" style="font-size:1.2rem;font-weight:700;color:#7a1a5c;padding:8px 0">
+          0 円
+        </div>
+      </div>
+    </div>
+
+    <!-- 振込先 -->
+    <div class="card">
+      <h2>補助金振込先（口座情報）</h2>
+      <div class="row">
+        <div class="field">
+          <label>金融機関名<span class="required">必須</span></label>
+          <input type="text" name="ginko_name" placeholder="○○銀行" required>
+        </div>
+        <div class="field">
+          <label>支店名<span class="required">必須</span></label>
+          <input type="text" name="shiten_name" placeholder="下関支店" required>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>口座種別<span class="required">必須</span></label>
+          <select name="koza_shubetsu" required>
+            <option value="">選択</option>
+            <option value="普通">普通</option>
+            <option value="当座">当座</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>口座番号<span class="required">必須</span></label>
+          <input type="text" name="koza_bango" placeholder="1234567" required>
+        </div>
+      </div>
+      <div class="field">
+        <label>口座名義人（カタカナ）<span class="required">必須</span></label>
+        <input type="text" name="koza_meigi" placeholder="ヤマダ タロウ" required>
+      </div>
+    </div>
+
+    <!-- 添付書類 -->
+    <div class="card">
+      <h2>添付書類（申請時に持参してください）</h2>
+      <div class="checklist">
+        <p>以下の書類を準備してください：</p>
+        <ul>
+          <li>婚姻届受理証明書または戸籍謄本</li>
+          <li>夫婦それぞれの所得証明書（前年度）</li>
+          <li>住民票（夫婦連名のもの）</li>
+          <li>住居に関する書類（賃貸借契約書・売買契約書・工事請負契約書等の写し）</li>
+          <li>費用の支払いを確認できる書類（領収書・振込明細等）</li>
+          <li>通帳の写し（金融機関名・支店名・口座番号・名義人が確認できるページ）</li>
+          <li>引越費用領収書（引越費用を申請する場合）</li>
+          <li>リフォーム工事の見積書・領収書（リフォーム費用を申請する場合）</li>
+        </ul>
+      </div>
+    </div>
+
+    {% set submit_label = "申請書を作成してダウンロード" %}
+    {% include "_submit.html" %}
+  </form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  bindZip({ zip1: 'shinkyo_input' });
+
+  function parseCost(id) {
+    const val = document.getElementById(id).value.replace(/,/g, '').trim();
+    return parseInt(val) || 0;
+  }
+
+  function calcTotal() {
+    const total = parseCost('cost1') + parseCost('cost2') + parseCost('cost3') + parseCost('cost4');
+    document.getElementById('total_display').textContent = total.toLocaleString() + ' 円';
+    document.getElementById('h_hoshu_gokei').value = total;
+  }
+
+  document.getElementById('mainForm').addEventListener('submit', function(e) {
+    const shinsei   = combineDate('shinsei_era','shinsei_year','shinsei_month','shinsei_day');
+    const otto_sei  = combineDate('otto_sei_era','otto_sei_year','otto_sei_month','otto_sei_day');
+    const tsuma_sei = combineDate('tsuma_sei_era','tsuma_sei_year','tsuma_sei_month','tsuma_sei_day');
+    const konin     = combineDate('konin_era','konin_year','konin_month','konin_day');
+    const nyu       = combineDate('nyu_era','nyu_year','nyu_month','nyu_day');
+    const errors    = [];
+    if (!shinsei)   errors.push('申請日');
+    if (!otto_sei)  errors.push('夫の生年月日');
+    if (!tsuma_sei) errors.push('妻の生年月日');
+    if (!konin)     errors.push('婚姻届受理日');
+    if (!nyu)       errors.push('入居年月日');
+    if (errors.length > 0) {
+      e.preventDefault();
+      alert('以下の項目を入力してください：\n・' + errors.join('\n・'));
+      return;
+    }
+    calcTotal();
+    document.getElementById('h_shinsei_date').value = shinsei;
+    document.getElementById('h_otto_sei').value     = otto_sei;
+    document.getElementById('h_tsuma_sei').value    = tsuma_sei;
+    document.getElementById('h_konin_date').value   = konin;
+    document.getElementById('h_nyukyo_date').value  = nyu;
+  });
+
+  fillMonthDay();
+  setToday('shinsei_year','shinsei_month','shinsei_day');
+</script>
+{% endblock %}

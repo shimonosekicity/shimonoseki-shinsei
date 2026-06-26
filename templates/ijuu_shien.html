@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+{% block title %}移住支援金支給申請書 作成フォーム{% endblock %}
+{% block accent %}#1a5c7a{% endblock %}
+{% block header_title %}移住支援金　支給申請書　作成フォーム{% endblock %}
+{% block header_sub %}下関市移住支援事業（東京圏からの移住）{% endblock %}
+
+{% block content %}
+  <form id="mainForm" action="/generate/ijuu_shien" method="POST" novalidate>
+
+    <input type="hidden" name="shinsei_date" id="h_shinsei_date">
+    <input type="hidden" name="seinengappi" id="h_seinengappi">
+    <input type="hidden" name="tennyu_date" id="h_tennyu_date">
+    <input type="hidden" name="shugyou_date" id="h_shugyou_date">
+
+    <!-- 対象者案内 -->
+    <div class="card" style="background:#ebf4ff;border-color:#1a56a0">
+      <h2 style="color:#1a3a5c">対象者について</h2>
+      <ul style="font-size:0.88rem;line-height:1.8;padding-left:1.2em">
+        <li>東京23区に在住または東京圏（東京・埼玉・千葉・神奈川）から通勤していた方</li>
+        <li>下関市へ移住し、就業・テレワーク・創業・専門人材として活動する方</li>
+        <li>支給額：単身60万円、世帯100万円（18歳未満の子1人につき+100万円）</li>
+      </ul>
+    </div>
+
+    <!-- 申請日 -->
+    <div class="card">
+      <h2>申請日</h2>
+      <div class="field">
+        <label>申請日<span class="required">必須</span></label>
+        <div class="date-row">
+          <select id="shinsei_era" class="era-sel">
+            <option value="令和" selected>令和</option>
+          </select>
+          <input type="number" id="shinsei_year" class="year-num" min="1" max="99" placeholder="年">
+          <span class="date-lbl">年</span>
+          <select id="shinsei_month" class="month-sel"><option value="">--</option></select>
+          <span class="date-lbl">月</span>
+          <select id="shinsei_day" class="day-sel"><option value="">--</option></select>
+          <span class="date-lbl">日</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 申請者情報 -->
+    <div class="card">
+      <h2>申請者情報</h2>
+      <div class="row">
+        <div class="field">
+          <label>氏名<span class="required">必須</span></label>
+          <input type="text" name="shimei" placeholder="山田 太郎" required>
+        </div>
+        <div class="field">
+          <label>ふりがな<span class="required">必須</span></label>
+          <input type="text" name="shimei_kana" placeholder="やまだ たろう" required>
+        </div>
+      </div>
+      <div class="field">
+        <label>現住所（下関市内）<span class="required">必須</span><span class="hint">郵便番号から自動入力</span></label>
+        <div class="zip-row">
+          <input type="text" id="zip1" placeholder="例：7500031" maxlength="8">
+          <button type="button" class="zip-btn" onclick="searchZip('zip1','jusho_input')">住所を検索</button>
+        </div>
+        <div id="zip1_msg" class="zip-msg"></div>
+        <input type="text" name="jusho" id="jusho_input" placeholder="下関市竹崎町1丁目1番1号（番地・部屋番号まで入力）" required>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>電話番号<span class="required">必須</span></label>
+          <input type="text" name="denwa" placeholder="083-231-1111" required>
+        </div>
+        <div class="field">
+          <label>年齢<span class="required">必須</span></label>
+          <input type="number" name="nenrei" placeholder="35" min="0" max="120" required>
+        </div>
+      </div>
+      <div class="field">
+        <label>生年月日<span class="required">必須</span></label>
+        <div class="date-row">
+          <select id="sei_era" class="era-sel">
+            <option value="昭和" selected>昭和</option>
+            <option value="平成">平成</option>
+            <option value="令和">令和</option>
+          </select>
+          <input type="number" id="sei_year" class="year-num" min="1" max="99" placeholder="年">
+          <span class="date-lbl">年</span>
+          <select id="sei_month" class="month-sel"><option value="">--</option></select>
+          <span class="date-lbl">月</span>
+          <select id="sei_day" class="day-sel"><option value="">--</option></select>
+          <span class="date-lbl">日</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 転入情報 -->
+    <div class="card">
+      <h2>転入情報</h2>
+      <div class="field">
+        <label>転入年月日<span class="required">必須</span></label>
+        <div class="date-row">
+          <select id="ten_era" class="era-sel">
+            <option value="平成">平成</option>
+            <option value="令和" selected>令和</option>
+          </select>
+          <input type="number" id="ten_year" class="year-num" min="1" max="99" placeholder="年">
+          <span class="date-lbl">年</span>
+          <select id="ten_month" class="month-sel"><option value="">--</option></select>
+          <span class="date-lbl">月</span>
+          <select id="ten_day" class="day-sel"><option value="">--</option></select>
+          <span class="date-lbl">日</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>転入前の住所（東京圏の住所）<span class="required">必須</span><span class="hint">郵便番号から自動入力</span></label>
+        <div class="zip-row">
+          <input type="text" id="zip2" placeholder="例：1600001" maxlength="8">
+          <button type="button" class="zip-btn" onclick="searchZip('zip2','mae_jusho_input')">住所を検索</button>
+        </div>
+        <div id="zip2_msg" class="zip-msg"></div>
+        <input type="text" name="mae_jusho" id="mae_jusho_input" placeholder="東京都新宿区西新宿1丁目1番1号" required>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>東京圏での在住期間<span class="required">必須</span></label>
+          <input type="text" name="zaiju_kikan" placeholder="5年3ヶ月" required>
+        </div>
+        <div class="field">
+          <label>転入前の職業</label>
+          <input type="text" name="mae_shokugyo" placeholder="会社員（営業職）">
+        </div>
+      </div>
+    </div>
+
+    <!-- 申請区分・就業情報 -->
+    <div class="card">
+      <h2>申請区分・就業情報</h2>
+      <div class="field">
+        <label>申請区分<span class="required">必須</span></label>
+        <select name="shinsei_kubun" required>
+          <option value="">選択してください</option>
+          <option value="就業（雇用）">就業（雇用）</option>
+          <option value="テレワーク">テレワーク</option>
+          <option value="創業">創業</option>
+          <option value="専門人材">専門人材</option>
+        </select>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>勤務先・就業先名</label>
+          <input type="text" name="kinmusaki_name" placeholder="株式会社○○">
+        </div>
+        <div class="field">
+          <label>勤務先所在地</label>
+          <input type="text" name="kinmusaki_jusho" placeholder="下関市竹崎町1丁目">
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>雇用形態</label>
+          <select name="koyo_keitai">
+            <option value="">選択</option>
+            <option value="正規雇用">正規雇用</option>
+            <option value="非正規雇用">非正規雇用</option>
+            <option value="自営業（創業）">自営業（創業）</option>
+            <option value="テレワーク">テレワーク</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>就業・開業年月日</label>
+          <div class="date-row">
+            <select id="shu_era" class="era-sel">
+              <option value="令和" selected>令和</option>
+            </select>
+            <input type="number" id="shu_year" class="year-num" min="1" max="99" placeholder="年">
+            <span class="date-lbl">年</span>
+            <select id="shu_month" class="month-sel"><option value="">--</option></select>
+            <span class="date-lbl">月</span>
+            <select id="shu_day" class="day-sel"><option value="">--</option></select>
+            <span class="date-lbl">日</span>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label>事業内容（創業の場合）</label>
+        <textarea name="jigyo_naiyou" rows="2" placeholder="創業する事業の内容を記入してください（創業の場合のみ）"></textarea>
+      </div>
+      <div class="field">
+        <label>帯同する18歳未満の子の人数<span class="required">必須</span></label>
+        <input type="number" name="kodomo_count" placeholder="0" min="0" max="20" value="0" required>
+        <span class="hint">0人の場合も「0」を入力してください。子1人につき100万円加算</span>
+      </div>
+    </div>
+
+    <!-- 振込先 -->
+    <div class="card">
+      <h2>支給金振込先（口座情報）</h2>
+      <div class="row">
+        <div class="field">
+          <label>金融機関名<span class="required">必須</span></label>
+          <input type="text" name="ginko_name" placeholder="○○銀行" required>
+        </div>
+        <div class="field">
+          <label>支店名<span class="required">必須</span></label>
+          <input type="text" name="shiten_name" placeholder="下関支店" required>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>口座種別<span class="required">必須</span></label>
+          <select name="koza_shubetsu" required>
+            <option value="">選択</option>
+            <option value="普通">普通</option>
+            <option value="当座">当座</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>口座番号<span class="required">必須</span></label>
+          <input type="text" name="koza_bango" placeholder="1234567" required>
+        </div>
+      </div>
+      <div class="field">
+        <label>口座名義人（カタカナ）<span class="required">必須</span></label>
+        <input type="text" name="koza_meigi" placeholder="ヤマダ タロウ" required>
+      </div>
+    </div>
+
+    <!-- 備考 -->
+    <div class="card">
+      <h2>備考</h2>
+      <div class="field">
+        <label>特記事項・備考</label>
+        <textarea name="biko" rows="3" placeholder="特記事項があれば入力してください"></textarea>
+      </div>
+    </div>
+
+    <!-- 添付書類 -->
+    <div class="card">
+      <h2>添付書類（申請時に持参してください）</h2>
+      <div class="checklist">
+        <p>以下の書類を準備してください：</p>
+        <ul>
+          <li>住民票（転入後のもの）</li>
+          <li>転入前の住所が確認できる書類（住民票の除票・公共料金領収書等）</li>
+          <li>就業証明書（勤務先が発行したもの）またはテレワーク証明書</li>
+          <li>誓約書（暴力団排除）</li>
+          <li>通帳の写し（金融機関名・支店名・口座番号・名義人が確認できるページ）</li>
+          <li>移住相談窓口の利用を確認できる書類（LiveHUBしものせきの証明等）</li>
+        </ul>
+      </div>
+    </div>
+
+    {% set submit_label = "申請書を作成してダウンロード" %}
+    {% include "_submit.html" %}
+  </form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  bindZip({ zip1: 'jusho_input', zip2: 'mae_jusho_input' });
+
+  document.getElementById('mainForm').addEventListener('submit', function(e) {
+    const shinsei = combineDate('shinsei_era','shinsei_year','shinsei_month','shinsei_day');
+    const sei     = combineDate('sei_era','sei_year','sei_month','sei_day');
+    const ten     = combineDate('ten_era','ten_year','ten_month','ten_day');
+    const shu     = combineDate('shu_era','shu_year','shu_month','shu_day');
+    const errors  = [];
+    if (!shinsei) errors.push('申請日');
+    if (!sei)     errors.push('生年月日');
+    if (!ten)     errors.push('転入年月日');
+    if (errors.length > 0) {
+      e.preventDefault();
+      alert('以下の項目を入力してください：\n・' + errors.join('\n・'));
+      return;
+    }
+    document.getElementById('h_shinsei_date').value  = shinsei;
+    document.getElementById('h_seinengappi').value   = sei;
+    document.getElementById('h_tennyu_date').value   = ten;
+    document.getElementById('h_shugyou_date').value  = shu;
+  });
+
+  fillMonthDay();
+  setToday('shinsei_year','shinsei_month','shinsei_day');
+</script>
+{% endblock %}
