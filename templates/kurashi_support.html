@@ -130,14 +130,20 @@
           <input type="text" name="yachin_getsugaku" placeholder="60000" required>
         </div>
         <div class="field">
-          <label>補助対象月数<span class="required">必須</span><span class="hint">最大24ヶ月</span></label>
-          <input type="number" name="hoshu_tsuki" placeholder="12" min="1" max="24" required>
+          <label>補助対象月数<span class="required">必須</span><span class="hint">最大12ヶ月／年度</span></label>
+          <input type="number" name="hoshu_tsuki" placeholder="12" min="1" max="12" required>
+          <p style="font-size:0.82rem;color:#e53e3e;margin-top:6px;font-weight:600">
+            ⚠️ 補助は年度ごとの申請で、1年度あたり最大12ヶ月です。24ヶ月を希望する場合は翌年度に再度申請が必要です。
+          </p>
         </div>
       </div>
       <div class="field">
         <label>家賃支払月の開始月<span class="required">必須</span></label>
         <p style="font-size:0.82rem;color:#718096;margin-bottom:6px">
-          賃貸借契約書・不動産業者からの領収書・見積書を確認したうえで記入してください
+          賃貸借契約書・不動産業者からの領収書・見積書を確認したうえで記入してください。<br>
+          <span style="color:#2b6cb0;font-weight:600">💡 ヒント：</span>
+          契約月は日割り計算となる場合が多く、翌月から満額の家賃支払いが始まるケースが一般的です。
+          開始月を翌月（満額支払い月）に設定すると、補助金を最大限受け取れる可能性があります。
         </p>
         <div class="date-row">
           <select id="ys_era" class="era-sel">
@@ -149,10 +155,6 @@
           <select id="ys_month" class="month-sel"><option value="">--</option></select>
           <span class="date-lbl">月</span>
         </div>
-      </div>
-      <div class="field">
-        <label>賃貸人氏名（大家さんの名前）</label>
-        <input type="text" name="chinshaku_nin" placeholder="山田 花子">
       </div>
     </div>
 
