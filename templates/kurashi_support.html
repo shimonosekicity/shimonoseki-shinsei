@@ -8,8 +8,8 @@
   <form id="mainForm" action="/generate/kurashi_support" method="POST" novalidate>
 
     <input type="hidden" name="shinsei_date" id="h_shinsei_date">
-    <input type="hidden" name="tennyu_date" id="h_tennyu_date">
     <input type="hidden" name="nyukyo_date" id="h_nyukyo_date">
+    <input type="hidden" name="chinshaku_date" id="h_chinshaku_date">
     <input type="hidden" name="yachin_start_month" id="h_yachin_start">
 
     <!-- 申請日 -->
@@ -59,29 +59,24 @@
       </div>
     </div>
 
-    <!-- 転入情報 -->
-    <div class="card">
-      <h2>転入情報</h2>
-      <div class="field">
-        <label>転入年月日<span class="required">必須</span></label>
-        <div class="date-row">
-          <select id="ten_era" class="era-sel">
-            <option value="平成">平成</option>
-            <option value="令和" selected>令和</option>
-          </select>
-          <input type="number" id="ten_year" class="year-num" min="1" max="99" placeholder="年">
-          <span class="date-lbl">年</span>
-          <select id="ten_month" class="month-sel"><option value="">--</option></select>
-          <span class="date-lbl">月</span>
-          <select id="ten_day" class="day-sel"><option value="">--</option></select>
-          <span class="date-lbl">日</span>
-        </div>
-      </div>
-    </div>
-
     <!-- 住居・家賃情報 -->
     <div class="card">
       <h2>住居・家賃情報</h2>
+      <div class="field">
+        <label>賃貸借契約日<span class="required">必須</span></label>
+        <div class="date-row">
+          <select id="chin_era" class="era-sel">
+            <option value="平成">平成</option>
+            <option value="令和" selected>令和</option>
+          </select>
+          <input type="number" id="chin_year" class="year-num" min="1" max="99" placeholder="年">
+          <span class="date-lbl">年</span>
+          <select id="chin_month" class="month-sel"><option value="">--</option></select>
+          <span class="date-lbl">月</span>
+          <select id="chin_day" class="day-sel"><option value="">--</option></select>
+          <span class="date-lbl">日</span>
+        </div>
+      </div>
       <div class="field">
         <label>入居年月日<span class="required">必須</span></label>
         <div class="date-row">
@@ -100,15 +95,24 @@
       <div class="row">
         <div class="field">
           <label>家賃月額（円）<span class="required">必須</span></label>
-          <input type="text" name="yachin_getsugaku" placeholder="60000" required>
+          <input type="number" name="yachin_getsugaku" id="yachin_getsugaku" placeholder="60000" min="1" required>
         </div>
         <div class="field">
           <label>補助対象月数<span class="required">必須</span><span class="hint">最大12ヶ月／年度</span></label>
-          <input type="number" name="hoshu_tsuki" placeholder="12" min="1" max="12" required>
+          <input type="number" name="hoshu_tsuki" id="hoshu_tsuki" placeholder="12" min="1" max="12" required>
           <p style="font-size:0.82rem;color:#718096;margin-top:6px">
             ※ 年度ごとに申請が必要です。
           </p>
         </div>
+      </div>
+      <div class="field">
+        <label>世帯区分<span class="required">必須</span></label>
+        <p style="font-size:0.82rem;color:#718096;margin-bottom:6px">補助金月額上限の算定に使用します</p>
+        <select name="setai_kubun" id="setai_kubun" required>
+          <option value="">選択してください</option>
+          <option value="child">中学生以下の子どもがいる世帯（上限２万円）</option>
+          <option value="young">世帯主が39歳以下の世帯（上限１万円）</option>
+        </select>
       </div>
       <div class="field">
         <label>家賃支払月の開始月<span class="required">必須</span></label>
@@ -137,9 +141,9 @@
       <div class="checklist">
         <p>以下の書類を準備してください：</p>
         <ul>
-          <li>住民票（世帯全員分）</li>
-          <li>転入前の住所が確認できる書類（住民票の除票等）</li>
           <li>賃貸借契約書の写し</li>
+          <li>転入後の住民票の写し</li>
+          <li>市税の滞納がないことの証明書</li>
         </ul>
       </div>
     </div>
@@ -154,28 +158,28 @@
   bindZip({ zip1: 'jusho_input' });
 
   document.getElementById('mainForm').addEventListener('submit', function(e) {
-    const shinsei = combineDate('shinsei_era','shinsei_year','shinsei_month','shinsei_day');
-    const ten     = combineDate('ten_era','ten_year','ten_month','ten_day');
-    const nyu     = combineDate('nyu_era','nyu_year','nyu_month','nyu_day');
-    // 家賃支払月（年・月のみ）
-    const ysEra   = document.getElementById('ys_era').value;
-    const ysYear  = document.getElementById('ys_year').value;
-    const ysMon   = document.getElementById('ys_month').value;
-    const ysStart = (ysYear && ysMon) ? `${ysEra}${ysYear}年${ysMon}月` : '';
-    const errors  = [];
-    if (!shinsei) errors.push('申請日');
-    if (!ten)     errors.push('転入年月日');
-    if (!nyu)     errors.push('入居年月日');
-    if (!ysStart) errors.push('家賃支払月の開始月');
+    const shinsei  = combineDate('shinsei_era','shinsei_year','shinsei_month','shinsei_day');
+    const chin     = combineDate('chin_era','chin_year','chin_month','chin_day');
+    const nyu      = combineDate('nyu_era','nyu_year','nyu_month','nyu_day');
+    const ysEra    = document.getElementById('ys_era').value;
+    const ysYear   = document.getElementById('ys_year').value;
+    const ysMon    = document.getElementById('ys_month').value;
+    const ysStart  = (ysYear && ysMon) ? `${ysEra}${ysYear}年${ysMon}月` : '';
+    const errors   = [];
+    if (!shinsei)  errors.push('申請日');
+    if (!chin)     errors.push('賃貸借契約日');
+    if (!nyu)      errors.push('入居年月日');
+    if (!ysStart)  errors.push('家賃支払月の開始月');
+    if (!document.getElementById('setai_kubun').value) errors.push('世帯区分');
     if (errors.length > 0) {
       e.preventDefault();
       alert('以下の項目を入力してください：\n・' + errors.join('\n・'));
       return;
     }
-    document.getElementById('h_shinsei_date').value = shinsei;
-    document.getElementById('h_tennyu_date').value  = ten;
-    document.getElementById('h_nyukyo_date').value  = nyu;
-    document.getElementById('h_yachin_start').value = ysStart;
+    document.getElementById('h_shinsei_date').value  = shinsei;
+    document.getElementById('h_chinshaku_date').value = chin;
+    document.getElementById('h_nyukyo_date').value   = nyu;
+    document.getElementById('h_yachin_start').value  = ysStart;
   });
 
   fillMonthDay();
