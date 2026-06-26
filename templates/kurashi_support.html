@@ -10,6 +10,7 @@
     <input type="hidden" name="shinsei_date" id="h_shinsei_date">
     <input type="hidden" name="tennyu_date" id="h_tennyu_date">
     <input type="hidden" name="nyukyo_date" id="h_nyukyo_date">
+    <input type="hidden" name="yachin_start_month" id="h_yachin_start">
 
     <!-- 申請日 -->
     <div class="card">
@@ -125,73 +126,33 @@
       </div>
       <div class="row">
         <div class="field">
-          <label>住居形態<span class="required">必須</span></label>
-          <select name="jutaku_keitai" required>
-            <option value="">選択してください</option>
-            <option value="賃貸（アパート・マンション等）">賃貸（アパート・マンション等）</option>
-            <option value="賃貸（一戸建て）">賃貸（一戸建て）</option>
-          </select>
-        </div>
-        <div class="field">
           <label>家賃月額（円）<span class="required">必須</span></label>
           <input type="text" name="yachin_getsugaku" placeholder="60000" required>
         </div>
-      </div>
-      <div class="row">
         <div class="field">
           <label>補助対象月数<span class="required">必須</span><span class="hint">最大24ヶ月</span></label>
           <input type="number" name="hoshu_tsuki" placeholder="12" min="1" max="24" required>
         </div>
-        <div class="field">
-          <label>賃貸借契約期間</label>
-          <input type="text" name="keiyaku_kikan" placeholder="令和7年4月1日〜令和9年3月31日">
+      </div>
+      <div class="field">
+        <label>家賃支払月の開始月<span class="required">必須</span></label>
+        <p style="font-size:0.82rem;color:#718096;margin-bottom:6px">
+          賃貸借契約書・不動産業者からの領収書・見積書を確認したうえで記入してください
+        </p>
+        <div class="date-row">
+          <select id="ys_era" class="era-sel">
+            <option value="平成">平成</option>
+            <option value="令和" selected>令和</option>
+          </select>
+          <input type="number" id="ys_year" class="year-num" min="1" max="99" placeholder="年">
+          <span class="date-lbl">年</span>
+          <select id="ys_month" class="month-sel"><option value="">--</option></select>
+          <span class="date-lbl">月</span>
         </div>
       </div>
       <div class="field">
         <label>賃貸人氏名（大家さんの名前）</label>
         <input type="text" name="chinshaku_nin" placeholder="山田 花子">
-      </div>
-    </div>
-
-    <!-- 振込先 -->
-    <div class="card">
-      <h2>補助金振込先（口座情報）</h2>
-      <div class="row">
-        <div class="field">
-          <label>金融機関名<span class="required">必須</span></label>
-          <input type="text" name="ginko_name" placeholder="○○銀行" required>
-        </div>
-        <div class="field">
-          <label>支店名<span class="required">必須</span></label>
-          <input type="text" name="shiten_name" placeholder="下関支店" required>
-        </div>
-      </div>
-      <div class="row">
-        <div class="field">
-          <label>口座種別<span class="required">必須</span></label>
-          <select name="koza_shubetsu" required>
-            <option value="">選択</option>
-            <option value="普通">普通</option>
-            <option value="当座">当座</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>口座番号<span class="required">必須</span></label>
-          <input type="text" name="koza_bango" placeholder="1234567" required>
-        </div>
-      </div>
-      <div class="field">
-        <label>口座名義人（カタカナ）<span class="required">必須</span></label>
-        <input type="text" name="koza_meigi" placeholder="ヤマダ タロウ" required>
-      </div>
-    </div>
-
-    <!-- 備考 -->
-    <div class="card">
-      <h2>備考</h2>
-      <div class="field">
-        <label>特記事項・備考</label>
-        <textarea name="biko" rows="3" placeholder="特記事項があれば入力してください"></textarea>
       </div>
     </div>
 
@@ -204,9 +165,6 @@
           <li>住民票（世帯全員分）</li>
           <li>転入前の住所が確認できる書類（住民票の除票等）</li>
           <li>賃貸借契約書の写し</li>
-          <li>家賃の支払いを確認できる書類（振込明細・領収書等）</li>
-          <li>通帳の写し（金融機関名・支店名・口座番号・名義人が確認できるページ）</li>
-          <li>移住相談窓口の利用を確認できる書類</li>
         </ul>
       </div>
     </div>
@@ -224,10 +182,16 @@
     const shinsei = combineDate('shinsei_era','shinsei_year','shinsei_month','shinsei_day');
     const ten     = combineDate('ten_era','ten_year','ten_month','ten_day');
     const nyu     = combineDate('nyu_era','nyu_year','nyu_month','nyu_day');
+    // 家賃支払月（年・月のみ）
+    const ysEra   = document.getElementById('ys_era').value;
+    const ysYear  = document.getElementById('ys_year').value;
+    const ysMon   = document.getElementById('ys_month').value;
+    const ysStart = (ysYear && ysMon) ? `${ysEra}${ysYear}年${ysMon}月` : '';
     const errors  = [];
     if (!shinsei) errors.push('申請日');
     if (!ten)     errors.push('転入年月日');
     if (!nyu)     errors.push('入居年月日');
+    if (!ysStart) errors.push('家賃支払月の開始月');
     if (errors.length > 0) {
       e.preventDefault();
       alert('以下の項目を入力してください：\n・' + errors.join('\n・'));
@@ -236,6 +200,7 @@
     document.getElementById('h_shinsei_date').value = shinsei;
     document.getElementById('h_tennyu_date').value  = ten;
     document.getElementById('h_nyukyo_date').value  = nyu;
+    document.getElementById('h_yachin_start').value = ysStart;
   });
 
   fillMonthDay();
