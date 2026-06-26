@@ -92,18 +92,12 @@
           <span class="date-lbl">日</span>
         </div>
       </div>
-      <div class="row">
-        <div class="field">
-          <label>家賃月額（円）<span class="required">必須</span></label>
-          <input type="number" name="yachin_getsugaku" id="yachin_getsugaku" placeholder="60000" min="1" required>
-        </div>
-        <div class="field">
-          <label>補助対象月数<span class="required">必須</span><span class="hint">最大12ヶ月／年度</span></label>
-          <input type="number" name="hoshu_tsuki" id="hoshu_tsuki" placeholder="12" min="1" max="12" required>
-          <p style="font-size:0.82rem;color:#718096;margin-top:6px">
-            ※ 年度ごとに申請が必要です。
-          </p>
-        </div>
+      <div class="field">
+        <label>家賃月額（円）<span class="required">必須</span></label>
+        <input type="number" name="yachin_getsugaku" id="yachin_getsugaku" placeholder="60000" min="1" required>
+        <p style="font-size:0.82rem;color:#718096;margin-top:6px">
+          ※ 補助対象月数・終了月は開始月から当該年度末（3月）まで自動計算されます。年度ごとに申請が必要です。
+        </p>
       </div>
       <div class="field">
         <label>世帯区分<span class="required">必須</span></label>
