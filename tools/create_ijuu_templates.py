@@ -152,14 +152,13 @@ def create_kurashi_support():
 
     # 住居・家賃情報テーブル
     add_section_heading(doc, '■ 住居・家賃情報')
-    tbl2 = doc.add_table(rows=3, cols=4)
+    tbl2 = doc.add_table(rows=2, cols=4)
     tbl2.alignment = WD_TABLE_ALIGNMENT.CENTER
     set_table_border(tbl2)
 
     data2 = [
         ('入居年月日', '{{ nyukyo_date }}', '家賃月額（円）', '{{ yachin_getsugaku }}'),
         ('補助対象月数', '{{ hoshu_tsuki }}ヶ月', '家賃支払月の開始月', '{{ yachin_start_month }}'),
-        ('賃貸人氏名', '{{ chinshaku_nin }}', '', ''),
     ]
     for i, (l1, v1, l2, v2) in enumerate(data2):
         row = tbl2.rows[i]
