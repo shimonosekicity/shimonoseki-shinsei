@@ -126,7 +126,7 @@ def create_kurashi_support():
 
     # 申請者情報テーブル
     add_section_heading(doc, '■ 申請者情報')
-    tbl = doc.add_table(rows=4, cols=4)
+    tbl = doc.add_table(rows=3, cols=4)
     tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
     set_table_border(tbl)
 
@@ -134,7 +134,6 @@ def create_kurashi_support():
         ('氏　　名', '{{ shimei }}', 'ふりがな', '{{ shimei_kana }}'),
         ('住　　所', '{{ jusho }}', '電話番号', '{{ denwa }}'),
         ('転入年月日', '{{ tennyu_date }}', '転入前住所', '{{ mae_jusho }}'),
-        ('世帯主年齢', '{{ setai_age }}歳', '中学生以下の子', '{{ kodomo_count }}人'),
     ]
     for i, (l1, v1, l2, v2) in enumerate(data):
         row = tbl.rows[i]
