@@ -18,13 +18,16 @@ DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.docu
 # 入力フォームページ
 # ──────────────────────────────────────────────────────────────
 PAGES = {
-    "/":          "top.html",
-    "/teijuu":    "teijuu.html",
-    "/shussan":   "shussan.html",
-    "/shogai":    "shogai.html",
-    "/noshin":    "noshin.html",
-    "/suido":     "suido.html",
-    "/kouminkan": "kouminkan.html",
+    "/":                    "top.html",
+    "/teijuu":              "teijuu.html",
+    "/shussan":             "shussan.html",
+    "/shogai":              "shogai.html",
+    "/noshin":              "noshin.html",
+    "/suido":               "suido.html",
+    "/kouminkan":           "kouminkan.html",
+    "/kurashi_support":     "kurashi_support.html",
+    "/ijuu_shien":          "ijuu_shien.html",
+    "/kekkon_shinseikatsu": "kekkon_shinseikatsu.html",
 }
 
 for url, page in PAGES.items():
@@ -169,6 +172,21 @@ FORMS = {
         "filename": "公民館使用中止届",
         "name_fields": ["dantai_name", "daihyo_name"],
         "extra": kouminkan_extra,
+    },
+    "kurashi_support": {
+        "template": "kurashi_support_template.docx",
+        "filename": "暮らしサポート補助金交付申請書",
+        "name_fields": ["shimei"],
+    },
+    "ijuu_shien": {
+        "template": "ijuu_shien_template.docx",
+        "filename": "移住支援金支給申請書",
+        "name_fields": ["shimei"],
+    },
+    "kekkon_shinseikatsu": {
+        "template": "kekkon_shinseikatsu_template.docx",
+        "filename": "結婚新生活支援補助金交付申請書",
+        "name_fields": ["otto_shimei", "tsuma_shimei"],
     },
 }
 
