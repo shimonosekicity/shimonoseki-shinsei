@@ -133,7 +133,7 @@ def create_kurashi_support():
     data = [
         ('氏　　名', '{{ shimei }}', 'ふりがな', '{{ shimei_kana }}'),
         ('住　　所', '{{ jusho }}', '電話番号', '{{ denwa }}'),
-        ('転入年月日', '{{ tennyu_date }}', '転入前住所', '{{ mae_jusho }}'),
+        ('転入年月日', '{{ tennyu_date }}', '', ''),
     ]
     for i, (l1, v1, l2, v2) in enumerate(data):
         row = tbl.rows[i]
