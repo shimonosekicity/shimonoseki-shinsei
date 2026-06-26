@@ -273,44 +273,6 @@ def create_ijuu_shien():
     set_col_width(tbl2, 2, 3.0)
     set_col_width(tbl2, 3, 5.5)
 
-    doc.add_paragraph()
-
-    # 振込先
-    add_section_heading(doc, '■ 支給金振込先（口座情報）')
-    tbl3 = doc.add_table(rows=3, cols=4)
-    tbl3.alignment = WD_TABLE_ALIGNMENT.CENTER
-    set_table_border(tbl3)
-
-    data3 = [
-        ('金融機関名', '{{ ginko_name }}', '支店名', '{{ shiten_name }}'),
-        ('口座種別', '{{ koza_shubetsu }}', '口座番号', '{{ koza_bango }}'),
-        ('口座名義人', '{{ koza_meigi }}', '', ''),
-    ]
-    for i, (l1, v1, l2, v2) in enumerate(data3):
-        row = tbl3.rows[i]
-        label_cell(row.cells[0], l1)
-        value_cell(row.cells[1], v1)
-        label_cell(row.cells[2], l2)
-        value_cell(row.cells[3], v2)
-
-    set_col_width(tbl3, 0, 3.0)
-    set_col_width(tbl3, 1, 5.5)
-    set_col_width(tbl3, 2, 3.0)
-    set_col_width(tbl3, 3, 5.5)
-
-    doc.add_paragraph()
-
-    # 備考
-    add_section_heading(doc, '■ 備考')
-    tbl4 = doc.add_table(rows=1, cols=1)
-    tbl4.alignment = WD_TABLE_ALIGNMENT.CENTER
-    set_table_border(tbl4)
-    cell = tbl4.rows[0].cells[0]
-    p = cell.paragraphs[0]
-    p.add_run('{{ biko }}')
-    p.runs[0].font.size = Pt(10)
-    cell.width = Cm(17)
-
     path = os.path.join(ROOT, 'ijuu_shien_template.docx')
     doc.save(path)
     print('ok: ijuu_shien_template.docx')
@@ -454,31 +416,6 @@ def create_kekkon_shinseikatsu():
     run = p.add_run('補助申請額合計：{{ hoshu_gokei }}円')
     run.font.size = Pt(11)
     run.font.bold = True
-
-    doc.add_paragraph()
-
-    # 振込先
-    add_section_heading(doc, '■ 補助金振込先（口座情報）')
-    tbl4 = doc.add_table(rows=3, cols=4)
-    tbl4.alignment = WD_TABLE_ALIGNMENT.CENTER
-    set_table_border(tbl4)
-
-    data4 = [
-        ('金融機関名', '{{ ginko_name }}', '支店名', '{{ shiten_name }}'),
-        ('口座種別', '{{ koza_shubetsu }}', '口座番号', '{{ koza_bango }}'),
-        ('口座名義人', '{{ koza_meigi }}', '', ''),
-    ]
-    for i, (l1, v1, l2, v2) in enumerate(data4):
-        row = tbl4.rows[i]
-        label_cell(row.cells[0], l1)
-        value_cell(row.cells[1], v1)
-        label_cell(row.cells[2], l2)
-        value_cell(row.cells[3], v2)
-
-    set_col_width(tbl4, 0, 3.0)
-    set_col_width(tbl4, 1, 5.5)
-    set_col_width(tbl4, 2, 3.0)
-    set_col_width(tbl4, 3, 5.5)
 
     path = os.path.join(ROOT, 'kekkon_shinseikatsu_template.docx')
     doc.save(path)
