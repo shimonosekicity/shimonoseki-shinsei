@@ -89,28 +89,25 @@ def kurashi_support_extra(form, ctx):
         yachin = int(str(form.get("yachin_getsugaku", "0")).replace(",", ""))
     except ValueError:
         yachin = 0
-    try:
-        tsuki = int(form.get("hoshu_tsuki", "0"))
-    except ValueError:
-        tsuki = 0
 
     half = yachin // 2
     monthly = (half // 1000) * 1000
     cap = 20000 if form.get("setai_kubun") == "child" else 10000
     monthly = min(monthly, cap)
 
-    # 家賃支払月の終了月を計算
-    start_str = form.get("yachin_start_month", "")  # 例: 令和7年4月
+    # 開始月から年度末（3月）を終了月として自動計算
+    start_str = form.get("yachin_start_month", "")
     end_str = ""
-    import re as _re
-    m = _re.match(r"(令和|平成)(\d+)年(\d+)月", start_str)
-    if m and tsuki > 0:
+    tsuki = 0
+    m = re.match(r"(令和|平成)(\d+)年(\d+)月", start_str)
+    if m:
         era, y, mon = m.group(1), int(m.group(2)), int(m.group(3))
-        total_months = (y - 1) * 12 + mon + tsuki - 1
-        end_y = (total_months - 1) // 12 + 1
-        end_mon = (total_months - 1) % 12 + 1
-        end_str = f"{era}{end_y}年{end_mon}月"
+        # 年度末：4月以降なら翌年3月、1〜3月ならその年の3月
+        end_y = y + 1 if mon >= 4 else y
+        end_str = f"{era}{end_y}年3月"
+        tsuki = (end_y - y) * 12 + 3 - mon + 1
 
+    ctx["hoshu_tsuki"] = str(tsuki)
     ctx["yachin_half"] = f"{half:,}"
     ctx["hoshu_gaku_monthly"] = f"{monthly:,}"
     ctx["yachin_end_month"] = end_str
